@@ -45,7 +45,7 @@ class Product {
   }
 
   String getStatus() {
-    return getStatus();
+    return this._status;
   }
 }
 
@@ -68,6 +68,7 @@ class ProductManager {
     }
 
     print('--- All Products ---');
+    print('---------------------------------');
     _products.forEach((key, product) {
       displayProduct(product);
     });
@@ -84,7 +85,7 @@ class ProductManager {
 
   void viewCompletedProducts() {
     var completed = _products.values
-        .where((p) => p._status == 'completed')
+        .where((p) => p.getStatus() == 'completed')
         .toList();
     if (completed.isEmpty) {
       print('No completed products.');
@@ -165,8 +166,9 @@ class ProductManager {
 
 void main() {
   final manager = ProductManager();
+  int choice = -1;
 
-  while (true) {
+  while (choice != 0) {
     print('\n===== 📱 E-Commerce Menu =====');
     print('1️⃣  Add Product');
     print('2️⃣  View All Products');
@@ -176,8 +178,8 @@ void main() {
     print('6️⃣  Edit Product');
     print('7️⃣  Delete Product');
     print('8️⃣  Mark Product as Completed');
-    print('9️⃣  Exit');
-    stdout.write('\n👉 Enter your choice (1-9): ');
+    print('0️⃣  Exit');
+    stdout.write('\n👉 Enter your choice (0-8): ');
     final input = stdin.readLineSync() ?? '';
 
     switch (input) {
@@ -238,12 +240,20 @@ void main() {
         manager.markAsCompleted(name);
         break;
 
-      case '9':
+      case '0':
         print('👋 Exiting... Thank you!');
         return;
 
       default:
-        print('❗ Invalid choice. Please select from 1 to 9.');
+        print('❗ Invalid choice. Please select from 0 to 8.');
+    }
+    stdout.write('\n Press 0 to exit or any other key to continue: ');
+    final exitInput = stdin.readLineSync();
+    if (exitInput == '0') {
+      choice = 0;
+    } else {
+      choice = -1;
     }
   }
+  print('👋 Exiting... Thank you!');
 }
