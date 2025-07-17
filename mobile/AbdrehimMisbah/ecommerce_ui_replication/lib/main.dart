@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'product_data.dart'; // <-- import your product list and class
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +8,300 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  Widget productHeading() {
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Available Products',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF3E3E3E), // Hex color #3E3E3E
+            ),
+          ),
+          Container(
+            width: 40,
+            height: 40,
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[400]!),
+              borderRadius: BorderRadius.circular(
+                8,
+              ), // optional rounded corners
+            ),
+            child: Icon(Icons.search, color: Colors.grey[400]),
+          ),
+        ],
+      ),
+    );
+  }
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  List<Widget> productCard() {
+    List<Widget> headingAndProductCard = [];
 
-  final String title;
+    // Add heading widget
+    // headingAndProductCard.add(productHeading());
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+    // Add product cards
+    headingAndProductCard.addAll(
+      products.map((product) {
+        return Card(
+          color: Colors.white,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Product Image
+              AspectRatio(
+                aspectRatio: 18 / 11,
+                child: Image.asset(product.image, fit: BoxFit.fitWidth),
+              ),
+              const SizedBox(height: 8),
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+              // Name + Price
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 4.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins', // Custom font family
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500, // Medium weight
+                        color: Color(0xFF3E3E3E), // Hex color #3E3E3E
+                      ),
+                    ),
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+                    Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontFamily: 'Poppins', // Custom font family
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500, // Medium weight
+                        color: Color(0xFF3E3E3E),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Type + Rating
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 4.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      product.type,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'Poppins', // Use Poppins font
+                        fontWeight: FontWeight.w400, // Regular weight
+                        color: Color(0xFFAAAAAA), // Hex color #AAAAAA
+                      ),
+                    ),
+
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Icon(
+                              Icons.star,
+                              color: Color(0xFFFFD700),
+                              size: 20,
+                            ),
+                          ),
+                          WidgetSpan(
+                            child: SizedBox(width: 4), // spacing
+                          ),
+                          TextSpan(
+                            text: '(${product.rating})',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'Sora', // Use Sora font
+                              fontWeight: FontWeight.w400, // Regular weight
+                              color: Color(0xFFAAAAAA), // Hex color #AAAAAA
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      }).toList(), // 👈 make sure this ends without a comma
+    );
+
+    return headingAndProductCard;
+  }
+
+  Widget userIntro() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+
+      children: [
+        Container(
+          width: 50, // Container width
+          height: 50, // Container height
+          decoration: BoxDecoration(
+            color: Color(0xFFCCCCCC), // Fill color
+            borderRadius: BorderRadius.circular(6), // Rounded corners
+          ),
+        ),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'July 17, 2025',
+              style: const TextStyle(
+                fontFamily: 'Syne', // Use Syne font
+                fontWeight: FontWeight.w500, // Medium weight
+                fontSize: 12,
+                color: Color(0xFFAAAAAA), // Hex color #AAAAAA
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text.rich(
+              TextSpan(
+                text: 'Hello, ',
+                style: const TextStyle(
+                  fontFamily: 'Sora', // Use Sora font
+                  fontWeight: FontWeight.w400, // Regular weight
+                  fontSize: 10,
+                  color: Color(0xFFAAAAAA),
+                ), // Default style
+
+                children: [
+                  TextSpan(
+                    text: 'Yohannes',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'sora',
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        title: userIntro(),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(
+                      Icons.notifications_none_rounded,
+                      color: Colors.grey[400],
+                      size: 20,
+                    ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: Stack(
+        children: [
+          ListView(
+            padding: const EdgeInsets.all(8.0),
+            children: [productHeading(), SizedBox(height: 8), ...productCard()],
+          ),
+
+          // Floating button absolutely positioned
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.add),
+                color: Colors.white,
+                onPressed: () {
+                  // Your action
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
