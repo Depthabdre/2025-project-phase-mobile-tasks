@@ -285,8 +285,8 @@ class HomePage extends StatelessWidget {
             bottom: 20,
             right: 20,
             child: Container(
-              width: 56,
-              height: 56,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,
