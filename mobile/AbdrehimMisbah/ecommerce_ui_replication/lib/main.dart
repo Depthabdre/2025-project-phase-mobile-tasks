@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'product_data.dart'; // <-- import your product list and class
 import 'details.dart';
+import 'addUpdate.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProductDetailsPage(),
+      home: AddUpdatePage(),
     );
   }
 }
