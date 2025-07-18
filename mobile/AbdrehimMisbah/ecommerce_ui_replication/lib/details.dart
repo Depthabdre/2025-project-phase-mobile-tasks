@@ -158,6 +158,8 @@ class ProductDetailsPage extends StatelessWidget {
                     itemCount: 6,
                     itemBuilder: (context, index) {
                       final size = 39 + index;
+                      final isSelected = size == 41;
+
                       return Container(
                         margin: const EdgeInsets.only(right: 4),
                         padding: const EdgeInsets.only(bottom: 2),
@@ -166,8 +168,12 @@ class ProductDetailsPage extends StatelessWidget {
                             // TODO: Handle tap event
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                            backgroundColor: isSelected
+                                ? const Color(0xFF3F51F3)
+                                : Colors.white,
+                            foregroundColor: isSelected
+                                ? Colors.white
+                                : const Color.fromARGB(255, 0, 0, 0),
                             elevation: 4,
                             shadowColor: const Color.fromRGBO(0, 0, 0, 0.10),
                             shape: RoundedRectangleBorder(
