@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'reusable.dart';
 
 class AddUpdatePage extends StatelessWidget {
   const AddUpdatePage({super.key});
@@ -71,19 +72,19 @@ class AddUpdatePage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Name Field
-              const _LabelText('Name'),
-              const _InputBox(),
+              buildLabelText('Name'),
+              buildInputBox(),
 
               const SizedBox(height: 16),
 
               // Category Field
-              const _LabelText('Category'),
-              const _InputBox(),
+              buildLabelText('Category'),
+              buildInputBox(),
 
               const SizedBox(height: 16),
 
               // Price Field with Dollar Icon
-              const _LabelText('Price'),
+              buildLabelText('Price'),
               TextField(
                 decoration: InputDecoration(
                   filled: true,
@@ -100,7 +101,7 @@ class AddUpdatePage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Description Field
-              const _LabelText('Description'),
+              buildLabelText('Description'),
               SizedBox(
                 height: 140,
                 child: TextField(
@@ -176,42 +177,6 @@ class AddUpdatePage extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _LabelText extends StatelessWidget {
-  final String text;
-  const _LabelText(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontWeight: FontWeight.w500,
-        fontSize: 14,
-        fontFamily: 'Poppins',
-      ),
-    );
-  }
-}
-
-class _InputBox extends StatelessWidget {
-  const _InputBox();
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFFF3F3F3),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       ),
     );
   }
