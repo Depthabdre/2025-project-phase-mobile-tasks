@@ -17,11 +17,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     Navigator.pop(context);
   }
 
-  void goToUpdateProductPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddUpdatePage()),
-    );
+  void goToUpdateProductPage(BuildContext context, Product product) {
+    Navigator.pushNamed(context, '/update', arguments: product);
   }
 
   @override
@@ -161,7 +158,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                         onPressed: () {
                           // TODO: Add your delete logic
-                          goBackToHomePage(context);
+                          Navigator.pop(context, {
+                            'action': 'delete',
+                            'productName': widget.product.name,
+                          });
                         },
                         child: const Text(
                           'Delete',
@@ -193,7 +193,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                         onPressed: () {
                           // TODO: Add your update logic
-                          goToUpdateProductPage(context);
+                          goToUpdateProductPage(context, product);
                         },
                         child: const Text(
                           'Update',

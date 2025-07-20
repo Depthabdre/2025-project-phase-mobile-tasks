@@ -1,11 +1,88 @@
 import 'package:flutter/material.dart';
 import 'reusable.dart';
+import 'product_data.dart';
 
-class AddUpdatePage extends StatelessWidget {
-  const AddUpdatePage({super.key});
+class AddUpdatePage extends StatefulWidget {
+  final Product? product; // ✅ Declare the field
+  const AddUpdatePage({super.key, this.product});
+
+  @override
+  State<AddUpdatePage> createState() => _AddUpdatePageState();
+}
+
+class _AddUpdatePageState extends State<AddUpdatePage> {
+  late TextEditingController nameController;
+  late TextEditingController categoryController;
+  late TextEditingController priceController;
+  late TextEditingController descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nameController = TextEditingController();
+    categoryController = TextEditingController();
+    priceController = TextEditingController();
+    descriptionController = TextEditingController();
+
+    final product = widget.product;
+    if (product != null) {
+      nameController.text = product.name;
+      categoryController.text = product.type;
+      priceController.text = product.price.toString();
+      descriptionController.text = product.description;
+    }
+  }
 
   void goBackToHomePage(BuildContext context) {
-    Navigator.pop(context);
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+  }
+
+  void addProduct() {
+    final name = nameController.text.trim();
+    final category = categoryController.text.trim();
+    final price = priceController.text.trim();
+    final description = descriptionController.text.trim();
+
+    if (name.isEmpty ||
+        category.isEmpty ||
+        price.isEmpty ||
+        description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all fields before adding the product.'),
+        ),
+      );
+      return;
+    }
+
+    double? priceValue = double.tryParse(price);
+    if (priceValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid price.')),
+      );
+      return;
+    }
+
+    final newProduct = Product(
+      name: name,
+      type: category,
+      image: 'images/default.jpeg', // Replace with actual path if available
+      price: priceValue,
+      rating: 4.0, // Default value
+      description: description,
+    );
+
+    Navigator.pop(context, newProduct); // Return new product to previous screen
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    categoryController.dispose();
+    priceController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -79,19 +156,43 @@ class AddUpdatePage extends StatelessWidget {
 
               // Name Field
               buildLabelText('Name'),
-              buildInputBox(),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFFF3F3F3),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+              ),
 
               const SizedBox(height: 16),
 
               // Category Field
               buildLabelText('Category'),
-              buildInputBox(),
+              TextField(
+                controller: categoryController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFFF3F3F3),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+              ),
 
               const SizedBox(height: 16),
 
-              // Price Field with Dollar Icon
+              // Price Field
               buildLabelText('Price'),
               TextField(
+                controller: priceController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xFFF3F3F3),
@@ -111,6 +212,7 @@ class AddUpdatePage extends StatelessWidget {
               SizedBox(
                 height: 140,
                 child: TextField(
+                  controller: descriptionController,
                   expands: true,
                   maxLines: null,
                   textAlignVertical: TextAlignVertical.top,
@@ -142,7 +244,7 @@ class AddUpdatePage extends StatelessWidget {
                       ),
                     ),
 
-                    onPressed: () {},
+                    onPressed: addProduct,
                     child: const Text(
                       'Add',
                       style: TextStyle(
@@ -168,7 +270,12 @@ class AddUpdatePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      nameController.clear();
+                      categoryController.clear();
+                      priceController.clear();
+                      descriptionController.clear();
+                    },
                     child: const Text(
                       'Delete',
                       style: TextStyle(

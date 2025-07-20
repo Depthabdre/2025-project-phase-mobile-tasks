@@ -16,7 +16,7 @@ class Product {
   });
 }
 
-List<Product> products = [
+List<Product> initialProducts = [
   Product(
     image: 'images/leather_shoe1.jpeg',
     name: 'Classic Leather Shoe',

@@ -15,18 +15,79 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: HomePage());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(builder: (_) => HomePage());
+
+          case '/details':
+            final product = settings.arguments as Product;
+            return MaterialPageRoute(
+              builder: (_) => ProductDetailsPage(product: product),
+            );
+
+          case '/update':
+            final product = settings.arguments as Product?;
+            return MaterialPageRoute<Product>(
+              builder: (_) => AddUpdatePage(product: product),
+            );
+
+          default:
+            return MaterialPageRoute(
+              builder: (_) => Scaffold(
+                body: Center(
+                  child: Text('No route defined for ${settings.name}'),
+                ),
+              ),
+            );
+        }
+      },
+    );
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  void goToAddProductPage(BuildContext context) {
-    Navigator.push(
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late List<Product> products;
+
+  @override
+  void initState() {
+    super.initState();
+    products = List.from(initialProducts);
+  }
+
+  // Navigate to Add Product
+  void goToAddProductPage(BuildContext context) async {
+    final result = await Navigator.pushNamed<Product>(
       context,
-      MaterialPageRoute(builder: (context) => AddUpdatePage()),
+      '/update',
+      arguments: null, // null = add new
     );
+    if (result != null) {
+      setState(() {
+        // Check if product with same name exists
+        final index = products.indexWhere(
+          (product) => product.name == result.name,
+        );
+
+        if (index != -1) {
+          // Product exists, update it
+          products[index] = result;
+        } else {
+          // Product doesn't exist, add it
+          products.add(result);
+        }
+      });
+    }
   }
 
   Widget productHeading() {
@@ -178,8 +239,11 @@ class HomePage extends StatelessWidget {
               ...productCard(
                 context: context,
                 products: products,
-                isInDetailPage:
-                    false, // or true if you're inside the detail screen
+                onDelete: (productName) {
+                  setState(() {
+                    products.removeWhere((p) => p.name == productName);
+                  });
+                },
               ),
             ],
           ),

@@ -101,7 +101,7 @@ class SearchPage extends StatelessWidget {
                 children: [
                   ...productCard(
                     context: context,
-                    products: products,
+                    products: initialProducts,
                     isInDetailPage:
                         false, // or true if you're inside the detail screen
                   ),

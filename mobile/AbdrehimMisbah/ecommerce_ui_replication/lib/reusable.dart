@@ -6,6 +6,7 @@ List<Widget> productCard({
   required BuildContext context,
   required List<Product> products,
   bool isInDetailPage = false,
+  void Function(String productName)? onDelete, // 👈 Add this
 }) {
   List<Widget> productCard = [];
 
@@ -16,16 +17,22 @@ List<Widget> productCard({
   productCard.addAll(
     products.map((product) {
       return GestureDetector(
-        onTap: () {
+        onTap: () async {
           if (!isInDetailPage) {
-            Navigator.push(
+            final result = await Navigator.pushNamed(
               context,
-              MaterialPageRoute(
-                builder: (context) => ProductDetailsPage(product: product),
-              ),
+              '/details',
+              arguments: product,
             );
+
+            if (result != null &&
+                result is Map &&
+                result['action'] == 'delete') {
+              onDelete!(result['productName']);
+            }
           }
         },
+
         child: Card(
           color: Colors.white,
           clipBehavior: Clip.antiAlias,
