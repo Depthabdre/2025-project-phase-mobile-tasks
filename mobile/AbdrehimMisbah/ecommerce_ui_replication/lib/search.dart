@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'product_data.dart';
 import 'reusable.dart';
 
 class SearchPage extends StatelessWidget {
@@ -98,7 +98,14 @@ class SearchPage extends StatelessWidget {
             ), // Leave space for bottom panel
             child: SingleChildScrollView(
               child: Column(
-                children: productCard(),
+                children: [
+                  ...productCard(
+                    context: context,
+                    products: products,
+                    isInDetailPage:
+                        false, // or true if you're inside the detail screen
+                  ),
+                ],
               ), // Your reusable product list
             ),
           ),

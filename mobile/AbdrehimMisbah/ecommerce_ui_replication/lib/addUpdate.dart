@@ -4,6 +4,10 @@ import 'reusable.dart';
 class AddUpdatePage extends StatelessWidget {
   const AddUpdatePage({super.key});
 
+  void goBackToHomePage(BuildContext context) {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +29,9 @@ class AddUpdatePage extends StatelessWidget {
           child: IconButton(
             icon: const Icon(Icons.arrow_back),
             color: Color(0xFF3F51F3),
-            onPressed: () {},
+            onPressed: () {
+              goBackToHomePage(context);
+            },
           ),
         ),
 
@@ -43,7 +49,7 @@ class AddUpdatePage extends StatelessWidget {
               Container(
                 height: 190,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3F3F3),
+                  color: const Color(0x0ff3f3f3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,

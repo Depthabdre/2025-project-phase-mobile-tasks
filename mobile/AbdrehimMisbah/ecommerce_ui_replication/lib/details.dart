@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
 import 'product_data.dart';
+import 'reusable.dart';
+import 'addUpdate.dart';
 
-class ProductDetailsPage extends StatelessWidget {
-  ProductDetailsPage({super.key}); // Accessing the first product
-  final product = products[0];
+class ProductDetailsPage extends StatefulWidget {
+  final Product product;
+
+  const ProductDetailsPage({super.key, required this.product});
+  @override
+  State<ProductDetailsPage> createState() => _ProductDetailsPageState();
+}
+
+class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  int selectedSize = 41;
+  void goBackToHomePage(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  void goToUpdateProductPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddUpdatePage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final product = widget.product;
     return Scaffold(
       // ✅ You must use Scaffold here
       backgroundColor: Colors.white,
@@ -14,116 +35,11 @@ class ProductDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Product Image
-              Padding(
-                padding: const EdgeInsets.only(top: 2.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 250,
-                  decoration: BoxDecoration(
-                    color: Colors
-                        .white, // Background color (not strictly needed here)
-
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ), // ✅ Rounded corners
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ), // ✅ Clip image to same border radius
-                    child: Image.asset(
-                      product.image,
-                      fit: BoxFit
-                          .fitWidth, // ✅ Fill container without distortion
-                    ),
-                  ),
-                ),
+              ...productCard(
+                context: context,
+                products: [product], // wrap single product in a list
+                isInDetailPage: true,
               ),
-
-              // 2. Row with type and rating
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                  right: 16.0,
-                  top: 16.0,
-                  bottom: 12.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      product.type,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFAAAAAA),
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: Icon(
-                              Icons.star,
-                              color: Color(0xFFFFD700),
-                              size: 20,
-                            ),
-                          ),
-                          const WidgetSpan(child: SizedBox(width: 4)),
-                          TextSpan(
-                            text: '(${product.rating})',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontFamily: 'Sora',
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFFAAAAAA),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // 3. Row with name and price
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                  right: 16.0,
-                  top: 8.0,
-                  bottom: 12.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      product.name,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF3E3E3E),
-                      ),
-                    ),
-                    Text(
-                      '\$${product.price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF3E3E3E),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               // 4. "Size" Text
               Padding(
                 padding: const EdgeInsets.only(
@@ -158,14 +74,16 @@ class ProductDetailsPage extends StatelessWidget {
                     itemCount: 6,
                     itemBuilder: (context, index) {
                       final size = 39 + index;
-                      final isSelected = size == 41;
+                      final isSelected = size == selectedSize;
 
                       return Container(
                         margin: const EdgeInsets.only(right: 4),
                         padding: const EdgeInsets.only(bottom: 2),
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Handle tap event
+                            setState(() {
+                              selectedSize = size;
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isSelected
@@ -201,13 +119,16 @@ class ProductDetailsPage extends StatelessWidget {
                   top: 8.0,
                   bottom: 12.0,
                 ),
-                child: Text(
-                  product.description,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xFF666666),
+                child: SizedBox(
+                  height: 260,
+                  child: Text(
+                    product.description,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Color(0xFF666666),
+                    ),
                   ),
                 ),
               ),
@@ -218,7 +139,7 @@ class ProductDetailsPage extends StatelessWidget {
                   left: 12.0,
                   right: 12.0,
                   top: 8.0,
-                  bottom: 12.0,
+                  bottom: 4.0,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,7 +160,8 @@ class ProductDetailsPage extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // delete action
+                          // TODO: Add your delete logic
+                          goBackToHomePage(context);
                         },
                         child: const Text(
                           'Delete',
@@ -270,7 +192,8 @@ class ProductDetailsPage extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // update action
+                          // TODO: Add your update logic
+                          goToUpdateProductPage(context);
                         },
                         child: const Text(
                           'Update',

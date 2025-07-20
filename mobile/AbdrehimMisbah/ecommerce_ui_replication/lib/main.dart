@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'product_data.dart'; // <-- import your product list and class
-import 'details.dart';
-import 'addUpdate.dart';
+// <-- import your product list and class
 import 'reusable.dart';
 import 'search.dart';
+import 'details.dart';
+import 'addUpdate.dart';
+import 'product_data.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,12 +15,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: SearchPage());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: HomePage());
   }
 }
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  void goToAddProductPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddUpdatePage()),
+    );
+  }
 
   Widget productHeading() {
     return Padding(
@@ -164,7 +172,16 @@ class HomePage extends StatelessWidget {
         children: [
           ListView(
             padding: const EdgeInsets.all(8.0),
-            children: [productHeading(), SizedBox(height: 8), ...productCard()],
+            children: [
+              productHeading(),
+              SizedBox(height: 8),
+              ...productCard(
+                context: context,
+                products: products,
+                isInDetailPage:
+                    false, // or true if you're inside the detail screen
+              ),
+            ],
           ),
 
           // Floating button absolutely positioned
@@ -183,6 +200,7 @@ class HomePage extends StatelessWidget {
                 color: Colors.white,
                 onPressed: () {
                   // Your action
+                  goToAddProductPage(context);
                 },
               ),
             ),
