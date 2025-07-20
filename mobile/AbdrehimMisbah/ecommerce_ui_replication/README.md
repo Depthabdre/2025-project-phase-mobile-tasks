@@ -1,16 +1,66 @@
-# ecommerce_ui_replication
+# 🛍️ Flutter E-Commerce UI App
 
-A new Flutter project.
+A clean and interactive E-Commerce Product Management app built with **Flutter**. This application allows users to view, add, update, and delete product items, designed with smooth animations and a modern UI.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## ✨ Features
 
-A few resources to get you started if this is your first Flutter project:
+- 📦 View a list of available products
+- ➕ Add new products with name, category, price, and description
+- ✏️ Update existing products
+- 🗑️ Delete products
+- 🔍 View detailed product information including size selection
+- 💫 Smooth page transitions (fade, slide, scale animations)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📸 Screenshots
+
+| Home Page                     | Product Details                     | Add Product                 |
+| ----------------------------- | ----------------------------------- | --------------------------- |
+| ![Home](screenshots/home.png) | ![Details](screenshots/details.png) | ![Add](screenshots/add.png) |
+
+> ⚠️ Note: Add your actual screenshot images to a `screenshots/` folder in your repo.
+
+---
+
+## 🚀 Getting Started
+
+### ✅ Prerequisites
+
+- Flutter SDK: [Install Flutter](https://flutter.dev/docs/get-started/install)
+- An IDE: VS Code / Android Studio
+- Emulator or physical device
+
+---
+
+### 🛠️ Installation
+
+Clone the repository and run the app:
+
+```bash
+# Clone this repository
+git clone https://github.com/your-username/flutter-ecommerce-ui.git
+
+# Go into the project folder
+cd flutter-ecommerce-ui
+
+# Install dependencies
+flutter pub get
+
+# Run the app
+flutter run
+
+
+Folder Structure
+lib/
+│
+├── main.dart             # App entry point and routes
+├── product_data.dart     # Product model and initial sample data
+├── reusable.dart         # Shared UI components (product cards, labels, etc.)
+├── details.dart          # Product details screen
+├── addUpdate.dart        # Add / update product screen
+├── search.dart           # (Optional) Search feature screen
+
+```
