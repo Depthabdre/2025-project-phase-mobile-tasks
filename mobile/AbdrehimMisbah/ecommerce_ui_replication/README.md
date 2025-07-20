@@ -19,11 +19,7 @@ A clean and interactive E-Commerce Product Management app built with **Flutter**
 
 | Home Page                     | Product Details                     | Add Product                 |
 | ----------------------------- | ----------------------------------- | --------------------------- |
-| ![Home](screenshots/home.png) | ![Details](screenshots/details.png) | ![Add](screenshots/add.png) |
-
-> ⚠️ Note: Add your actual screenshot images to a `screenshots/` folder in your repo.
-
----
+| ![Home](screenshots/home.jpg) | ![Details](screenshots/details.jpg) | ![Add](screenshots/add.jpg) |
 
 ## 🚀 Getting Started
 
