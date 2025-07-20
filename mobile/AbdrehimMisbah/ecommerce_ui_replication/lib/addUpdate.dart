@@ -73,7 +73,9 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
       description: description,
     );
 
-    Navigator.pop(context, newProduct); // Return new product to previous screen
+    Navigator.pop(context, newProduct);
+
+    // Return new product to previous screen
   }
 
   @override

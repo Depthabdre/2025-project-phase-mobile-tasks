@@ -7,6 +7,7 @@ List<Widget> productCard({
   required List<Product> products,
   bool isInDetailPage = false,
   void Function(String productName)? onDelete, // 👈 Add this
+  void Function(Product updatedProduct)? onUpdate,
 }) {
   List<Widget> productCard = [];
 
@@ -25,10 +26,15 @@ List<Widget> productCard({
               arguments: product,
             );
 
-            if (result != null &&
-                result is Map &&
-                result['action'] == 'delete') {
-              onDelete!(result['productName']);
+            if (result != null) {
+              // Handle delete action
+              if (result is Map && result['action'] == 'delete') {
+                onDelete?.call(result['productName']);
+              }
+              // Handle product update or new product
+              else if (result is Product) {
+                onUpdate?.call(result); // You’ll define this callback in a sec
+              }
             }
           }
         },

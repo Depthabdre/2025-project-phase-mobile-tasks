@@ -21,18 +21,45 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
-            return MaterialPageRoute(builder: (_) => HomePage());
+            return PageRouteBuilder(
+              pageBuilder: (_, __, ___) => HomePage(),
+              transitionsBuilder: (_, animation, __, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: Duration(milliseconds: 300),
+            );
 
           case '/details':
             final product = settings.arguments as Product;
-            return MaterialPageRoute(
-              builder: (_) => ProductDetailsPage(product: product),
+            return PageRouteBuilder(
+              pageBuilder: (_, __, ___) => ProductDetailsPage(product: product),
+              transitionsBuilder: (_, animation, __, child) {
+                final offsetAnimation = Tween<Offset>(
+                  begin: Offset(1.0, 0.0), // Slide from right
+                  end: Offset.zero,
+                ).animate(animation);
+
+                return SlideTransition(position: offsetAnimation, child: child);
+              },
+              transitionDuration: Duration(milliseconds: 300),
             );
 
           case '/update':
             final product = settings.arguments as Product?;
-            return MaterialPageRoute<Product>(
-              builder: (_) => AddUpdatePage(product: product),
+            return PageRouteBuilder<Product>(
+              pageBuilder: (_, __, ___) => AddUpdatePage(product: product),
+              transitionsBuilder: (_, animation, __, child) {
+                final scaleAnimation = Tween<double>(
+                  begin: 0.95,
+                  end: 1.0,
+                ).animate(animation);
+
+                return ScaleTransition(
+                  scale: scaleAnimation,
+                  child: FadeTransition(opacity: animation, child: child),
+                );
+              },
+              transitionDuration: Duration(milliseconds: 300),
             );
 
           default:
@@ -242,6 +269,18 @@ class _HomePageState extends State<HomePage> {
                 onDelete: (productName) {
                   setState(() {
                     products.removeWhere((p) => p.name == productName);
+                  });
+                },
+                onUpdate: (updatedProduct) {
+                  setState(() {
+                    final index = products.indexWhere(
+                      (p) => p.name == updatedProduct.name,
+                    );
+                    if (index != -1) {
+                      products[index] = updatedProduct;
+                    } else {
+                      products.add(updatedProduct);
+                    }
                   });
                 },
               ),

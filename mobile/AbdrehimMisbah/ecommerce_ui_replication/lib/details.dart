@@ -17,8 +17,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     Navigator.pop(context);
   }
 
-  void goToUpdateProductPage(BuildContext context, Product product) {
-    Navigator.pushNamed(context, '/update', arguments: product);
+  void goToUpdateProductPage(BuildContext context, Product product) async {
+    final updatedProduct = await Navigator.pushNamed<Product>(
+      context,
+      '/update',
+      arguments: product,
+    );
+
+    if (updatedProduct != null) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context, updatedProduct); // pass it up to HomePage
+    }
   }
 
   @override
