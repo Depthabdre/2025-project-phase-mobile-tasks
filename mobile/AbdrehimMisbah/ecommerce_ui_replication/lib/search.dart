@@ -13,8 +13,8 @@ class SearchPage extends StatelessWidget {
         automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Center(
-          child: const Text(
+        title: const Center(
+          child: Text(
             'Search Product',
             style: TextStyle(
               fontSize: 16,
@@ -29,7 +29,7 @@ class SearchPage extends StatelessWidget {
           margin: const EdgeInsets.only(left: 16),
           child: IconButton(
             icon: const Icon(Icons.arrow_back),
-            color: Color(0xFF3F51F3),
+            color: const Color(0xFF3F51F3),
             onPressed: () {},
           ),
         ),
@@ -56,7 +56,7 @@ class SearchPage extends StatelessWidget {
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                         ),
-                        suffixIcon: Icon(
+                        suffixIcon: const Icon(
                           Icons.arrow_forward,
                           size: 20,
                           color: Color(0xFF3F51F3),
@@ -75,7 +75,7 @@ class SearchPage extends StatelessWidget {
                     color: const Color(0xFF3F51F3),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Icon(
                       Icons
                           .filter_list, // Replace with your actual vector icon if available
@@ -140,7 +140,7 @@ class SearchPage extends StatelessWidget {
                       height: 44,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF3F51F3),
+                          backgroundColor: const Color(0xFF3F51F3),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -184,7 +184,7 @@ class _PriceRangeSliderState extends State<PriceRangeSlider> {
       data: SliderTheme.of(context).copyWith(
         trackHeight: 11,
         inactiveTrackColor: const Color(0xFFD9D9D9),
-        activeTrackColor: Color(0xFF3F51F3),
+        activeTrackColor: const Color(0xFF3F51F3),
         thumbColor: Colors.white,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
         overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),

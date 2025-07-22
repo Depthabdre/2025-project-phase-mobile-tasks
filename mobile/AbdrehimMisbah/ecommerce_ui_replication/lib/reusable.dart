@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'product_data.dart'; // <-- import your product list and class
-import 'details.dart';
 
 List<Widget> productCard({
   required BuildContext context,
@@ -108,7 +107,7 @@ List<Widget> productCard({
                     Text.rich(
                       TextSpan(
                         children: [
-                          WidgetSpan(
+                          const WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
                             child: Icon(
                               Icons.star,
@@ -116,7 +115,7 @@ List<Widget> productCard({
                               size: 20,
                             ),
                           ),
-                          WidgetSpan(
+                          const WidgetSpan(
                             child: SizedBox(width: 4), // spacing
                           ),
                           TextSpan(

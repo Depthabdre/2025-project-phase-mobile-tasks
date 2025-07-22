@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+
+import 'addUpdate.dart';
+import 'details.dart';
+import 'product_data.dart';
 // <-- import your product list and class
 import 'reusable.dart';
-import 'search.dart';
-import 'details.dart';
-import 'addUpdate.dart';
-import 'product_data.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,11 +22,11 @@ class MyApp extends StatelessWidget {
         switch (settings.name) {
           case '/':
             return PageRouteBuilder(
-              pageBuilder: (_, __, ___) => HomePage(),
+              pageBuilder: (_, __, ___) => const HomePage(),
               transitionsBuilder: (_, animation, __, child) {
                 return FadeTransition(opacity: animation, child: child);
               },
-              transitionDuration: Duration(milliseconds: 300),
+              transitionDuration: const Duration(milliseconds: 300),
             );
 
           case '/details':
@@ -35,13 +35,13 @@ class MyApp extends StatelessWidget {
               pageBuilder: (_, __, ___) => ProductDetailsPage(product: product),
               transitionsBuilder: (_, animation, __, child) {
                 final offsetAnimation = Tween<Offset>(
-                  begin: Offset(1.0, 0.0), // Slide from right
+                  begin: const Offset(1.0, 0.0), // Slide from right
                   end: Offset.zero,
                 ).animate(animation);
 
                 return SlideTransition(position: offsetAnimation, child: child);
               },
-              transitionDuration: Duration(milliseconds: 300),
+              transitionDuration: const Duration(milliseconds: 300),
             );
 
           case '/update':
@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
                   child: FadeTransition(opacity: animation, child: child),
                 );
               },
-              transitionDuration: Duration(milliseconds: 300),
+              transitionDuration: const Duration(milliseconds: 300),
             );
 
           default:
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
+          const Text(
             'Available Products',
             style: TextStyle(
               fontFamily: 'Poppins',
@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: 40,
             height: 40,
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey[400]!),
               borderRadius: BorderRadius.circular(
@@ -160,29 +160,29 @@ class _HomePageState extends State<HomePage> {
           width: 50, // Container width
           height: 50, // Container height
           decoration: BoxDecoration(
-            color: Color(0xFFCCCCCC), // Fill color
+            color: const Color(0xFFCCCCCC), // Fill color
             borderRadius: BorderRadius.circular(6), // Rounded corners
           ),
         ),
         const SizedBox(width: 8),
-        Column(
+        const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'July 17, 2025',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Syne', // Use Syne font
                 fontWeight: FontWeight.w500, // Medium weight
                 fontSize: 12,
                 color: Color(0xFFAAAAAA), // Hex color #AAAAAA
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text.rich(
               TextSpan(
                 text: 'Hello, ',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Sora', // Use Sora font
                   fontWeight: FontWeight.w400, // Regular weight
                   fontSize: 10,
@@ -262,7 +262,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8.0),
             children: [
               productHeading(),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               ...productCard(
                 context: context,
                 products: products,
@@ -294,12 +294,12 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               width: 72,
               height: 72,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 color: Colors.white,
                 onPressed: () {
                   // Your action

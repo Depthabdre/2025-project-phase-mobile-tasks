@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'reusable.dart';
+
 import 'product_data.dart';
+import 'reusable.dart';
 
 class AddUpdatePage extends StatefulWidget {
   final Product? product; // ✅ Declare the field
@@ -107,7 +108,7 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
           margin: const EdgeInsets.only(left: 16),
           child: IconButton(
             icon: const Icon(Icons.arrow_back),
-            color: Color(0xFF3F51F3),
+            color: const Color(0xFF3F51F3),
             onPressed: () {
               goBackToHomePage(context);
             },
@@ -132,13 +133,13 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
-                child: SizedBox(
+                child: const SizedBox(
                   width: 120,
                   height: 93,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(Icons.image, size: 48, color: Colors.grey),
                       SizedBox(height: 8),
                       Text(

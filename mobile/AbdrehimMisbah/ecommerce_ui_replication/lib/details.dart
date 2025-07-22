@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'product_data.dart';
 import 'reusable.dart';
-import 'addUpdate.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
@@ -47,14 +46,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 isInDetailPage: true,
               ),
               // 4. "Size" Text
-              Padding(
-                padding: const EdgeInsets.only(
+              const Padding(
+                padding: EdgeInsets.only(
                   left: 16.0,
                   right: 16.0,
                   top: 8.0,
                   bottom: 12.0,
                 ),
-                child: const Text(
+                child: Text(
                   'Size:',
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -189,7 +188,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       width: 152,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF3F51F3),
+                          backgroundColor: const Color(0xFF3F51F3),
                           padding: const EdgeInsets.symmetric(
                             vertical: 14,
                             horizontal: 20,
