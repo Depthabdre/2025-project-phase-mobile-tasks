@@ -41,7 +41,7 @@ void main() {
       ).thenAnswer((_) async => const Right(unit));
 
       // Act
-      final result = await usecase(testProduct);
+      final result = await usecase(Params(testProduct));
 
       // Assert
       expect(result, const Right(unit)); // check the result is correct
@@ -68,7 +68,7 @@ void main() {
       ).thenAnswer((_) async => Left(ServerFailure()));
 
       // Act
-      final result = await usecase(testProduct);
+      final result = await usecase(Params(testProduct));
 
       // Assert
       expect(result, Left(ServerFailure())); // check the result is failure
