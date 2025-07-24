@@ -47,7 +47,7 @@ test/
 
 ## 🔄 Data Flow
 
-![Clean Architecture Diagram](screenshot/Clean-Architecture-Flutter-Diagram.webp)
+![Clean Architecture Diagram](screenshots/Clean-Architecture-Flutter-Diagram.webp)
 
 
 Each layer only depends on the layer directly below it. This ensures high decoupling and testability.
