@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/product_data.dart';
+// <-- import your product list and class
+import '../widgets/reusable.dart';
 import 'addUpdate.dart';
 import 'details.dart';
-import 'product_data.dart';
-// <-- import your product list and class
-import 'reusable.dart';
 
 void main() {
   runApp(const MyApp());

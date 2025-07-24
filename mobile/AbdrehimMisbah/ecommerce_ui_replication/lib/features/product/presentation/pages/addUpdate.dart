@@ -1,7 +1,8 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 
-import 'product_data.dart';
-import 'reusable.dart';
+import '../widgets/product_data.dart';
+import '../widgets/reusable.dart';
 
 class AddUpdatePage extends StatefulWidget {
   final Product? product; // ✅ Declare the field
