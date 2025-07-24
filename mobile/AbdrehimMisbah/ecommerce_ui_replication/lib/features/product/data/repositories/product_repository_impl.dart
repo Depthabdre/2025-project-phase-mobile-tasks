@@ -1,11 +1,13 @@
 import 'package:dartz/dartz.dart';
 
+import '../../../../core/error/exception.dart';
 import '../../../../core/error/failure.dart';
 import '../../../../core/platform/network_info.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_local_data_source.dart';
 import '../datasources/product_remote_data_source.dart';
+import '../models/product_model.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource remoteDataSource;
@@ -32,7 +34,16 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<Either<Failure, Unit>> createProduct(Product product) async {
-    // TODO: implement
+    // TODO:
+    if (await networkInfo.isConnected) {
+      try {
+        final productModel = ProductModel.fromEntity(product);
+        await remoteDataSource.createProduct(productModel);
+        return const Right(unit);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    }
     return Left(ServerFailure());
   }
 

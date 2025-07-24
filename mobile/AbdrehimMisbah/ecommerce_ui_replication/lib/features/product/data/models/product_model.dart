@@ -9,6 +9,16 @@ class ProductModel extends Product {
     required super.description,
   });
 
+  // ✅ Add this method to convert from domain entity → model
+  factory ProductModel.fromEntity(Product product) {
+    return ProductModel(
+      id: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      price: product.price,
+      description: product.description,
+    );
+  }
   // 🧠 Important: fromJson converts Map → ProductModel
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
