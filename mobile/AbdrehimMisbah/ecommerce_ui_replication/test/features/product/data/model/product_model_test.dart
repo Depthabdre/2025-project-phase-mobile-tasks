@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:ecommerce_ui_replication/features/product/data/models/product_model.dart';
 import 'package:ecommerce_ui_replication/features/product/domain/entities/product.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../fixtures/fixture_reader.dart';
+import '../../../../fixtures/fixture_reader.dart';
 
 void main() {
   const tProductModel = ProductModel(
