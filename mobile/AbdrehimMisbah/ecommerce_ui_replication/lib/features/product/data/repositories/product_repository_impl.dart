@@ -22,40 +22,88 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<Either<Failure, List<Product>>> getAllProducts() async {
-    // TODO: implement
-    return Left(ServerFailure());
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteProducts = await remoteDataSource.getAllProducts();
+        localDataSource.cacheProductList(remoteProducts);
+        return Right(remoteProducts);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      try {
+        final localProducts = await localDataSource.getLastProductList();
+        return Right(localProducts);
+      } on CacheException {
+        return Left(CacheFailure());
+      }
+    }
   }
 
   @override
   Future<Either<Failure, Product>> getProductById(int id) async {
-    // TODO: implement
-    return Left(ServerFailure());
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteProduct = await remoteDataSource.getProductById(id);
+        await localDataSource.cacheProduct(remoteProduct);
+        return Right(remoteProduct);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      try {
+        final localProduct = await localDataSource.getProductById(id);
+        return Right(localProduct);
+      } on CacheException {
+        return Left(CacheFailure());
+      }
+    }
   }
 
   @override
   Future<Either<Failure, Unit>> createProduct(Product product) async {
-    // TODO:
     if (await networkInfo.isConnected) {
       try {
-        final productModel = ProductModel.fromEntity(product);
-        await remoteDataSource.createProduct(productModel);
+        final model = ProductModel.fromEntity(product);
+        await remoteDataSource.createProduct(model);
+        await localDataSource.cacheProduct(model);
         return const Right(unit);
       } on ServerException {
         return Left(ServerFailure());
       }
+    } else {
+      return Left(NetworkFailure());
     }
-    return Left(ServerFailure());
   }
 
   @override
   Future<Either<Failure, Unit>> updateProduct(Product product) async {
-    // TODO: implement
-    return Left(ServerFailure());
+    if (await networkInfo.isConnected) {
+      try {
+        final model = ProductModel.fromEntity(product);
+        await remoteDataSource.updateProduct(model);
+        await localDataSource.cacheProduct(model);
+        return const Right(unit);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(NetworkFailure());
+    }
   }
 
   @override
   Future<Either<Failure, Unit>> deleteProduct(int id) async {
-    // TODO: implement
-    return Left(ServerFailure());
+    if (await networkInfo.isConnected) {
+      try {
+        await remoteDataSource.deleteProduct(id);
+        await localDataSource.deleteProduct(id);
+        return const Right(unit);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(NetworkFailure());
+    }
   }
 }
