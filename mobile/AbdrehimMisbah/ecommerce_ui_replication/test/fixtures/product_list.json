@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "imageUrl": "https://example.com/image1.jpg",
+    "name": "Test Product",
+    "price": 19.99,
+    "description": "A sample product for testing."
+  },
+  {
+    "id": 2,
+    "imageUrl": "https://example.com/image2.jpg",
+    "name": "Another Product",
+    "price": 29.99,
+    "description": "Another sample product used for testing purposes."
+  },
+  {
+    "id": 3,
+    "imageUrl": "https://example.com/image3.jpg",
+    "name": "Wireless Headphones",
+    "price": 59.99,
+    "description": "High-quality wireless headphones with noise cancellation."
+  },
+  {
+    "id": 4,
+    "imageUrl": "https://example.com/image4.jpg",
+    "name": "Smart Watch",
+    "price": 89.99,
+    "description": "A smart watch with fitness tracking features."
+  },
+  {
+    "id": 5,
+    "imageUrl": "https://example.com/image5.jpg",
+    "name": "Bluetooth Speaker",
+    "price": 39.99,
+    "description": "Portable Bluetooth speaker with deep bass and long battery life."
+  }
+]
