@@ -22,7 +22,7 @@ class ProductModel extends Product {
   // 🧠 Important: fromJson converts Map → ProductModel
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] as int,
+      id: json['id'] ,
       name: json['name'],
       imageUrl: json['imageUrl'],
       price: (json['price'] as num).toDouble(), // handles 1 or 1.0

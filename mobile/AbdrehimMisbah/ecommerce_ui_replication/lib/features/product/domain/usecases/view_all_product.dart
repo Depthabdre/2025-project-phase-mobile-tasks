@@ -18,7 +18,7 @@ class ViewProductUsecase extends UseCase<Product, Params> {
 
 // Params class for input
 class Params {
-  final int id;
+  final String id;
 
   Params(this.id);
 }
