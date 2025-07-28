@@ -14,7 +14,7 @@ abstract class ProductLocalDataSource {
   /// Gets the cached [ProductModel] by its ID.
   ///
   /// Throws [CacheException] if the product is not found.
-  Future<ProductModel> getProductById(int id);
+  Future<ProductModel> getProductById(String id);
 
   /// Caches a list of products for later retrieval.
   Future<void> cacheProductList(List<ProductModel> products);
@@ -23,7 +23,7 @@ abstract class ProductLocalDataSource {
   Future<void> cacheProduct(ProductModel product);
 
   /// Deletes a cached product by ID.
-  Future<void> deleteProduct(int id);
+  Future<void> deleteProduct(String id);
 }
 
 // ignore: constant_identifier_names
@@ -51,7 +51,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   }
 
   @override
-  Future<ProductModel> getProductById(int id) {
+  Future<ProductModel> getProductById(String id) {
     final jsonString = sharedPreferences.getString('CACHED_PRODUCT_LIST');
 
     if (jsonString != null) {
@@ -104,7 +104,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   }
 
   @override
-  Future<void> deleteProduct(int id) async {
+  Future<void> deleteProduct(String id) async {
     final jsonString = sharedPreferences.getString('CACHED_PRODUCT_LIST');
 
     if (jsonString != null) {
