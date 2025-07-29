@@ -33,7 +33,7 @@ void main() {
 
   group('getAllProducts', () {
     final testProductModel = const ProductModel(
-      id: 1,
+      id: '1',
       name: 'Test Product',
       imageUrl: 'https://example.com/image.png',
       price: 99.99,
@@ -159,7 +159,7 @@ void main() {
   });
 
   group('getProductById', () {
-    const tId = 1;
+    const tId = '1';
     final testProductModel = const ProductModel(
       id: tId,
       name: 'Test Product',
@@ -286,7 +286,7 @@ void main() {
 
   group('createProduct', () {
     final testProduct = const Product(
-      id: 1,
+      id: '1',
       name: 'New Product',
       imageUrl: 'https://example.com/image.png',
       price: 49.99,
@@ -299,7 +299,7 @@ void main() {
       when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
       when(
         mockRemoteDataSource.createProduct(testProductModel),
-      ).thenAnswer((_) async => null);
+      ).thenAnswer((_) async {});
 
       // act
       await repository.createProduct(testProduct);
@@ -319,7 +319,7 @@ void main() {
           // arrange
           when(
             mockRemoteDataSource.createProduct(testProductModel),
-          ).thenAnswer((_) async => null);
+          ).thenAnswer((_) async {});
 
           // act
           final result = await repository.createProduct(testProduct);
@@ -369,7 +369,7 @@ void main() {
 
   group('updateProduct', () {
     final testProduct = const Product(
-      id: 1,
+      id: '1',
       name: 'Updated Product',
       imageUrl: 'https://example.com/image.png',
       price: 59.99,
@@ -382,7 +382,7 @@ void main() {
       when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
       when(
         mockRemoteDataSource.updateProduct(testProductModel),
-      ).thenAnswer((_) async => null);
+      ).thenAnswer((_) async {});
 
       // act
       await repository.updateProduct(testProduct);
@@ -402,7 +402,7 @@ void main() {
           // arrange
           when(
             mockRemoteDataSource.updateProduct(testProductModel),
-          ).thenAnswer((_) async => null);
+          ).thenAnswer((_) async {});
 
           // act
           final result = await repository.updateProduct(testProduct);
@@ -451,7 +451,7 @@ void main() {
   });
 
   group('deleteProduct', () {
-    final testId = 1;
+    final testId = '1';
 
     test('should check if device is online', () async {
       // arrange

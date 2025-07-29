@@ -6,65 +6,39 @@ import '../../../../core/error/exception.dart';
 import '../models/product_model.dart';
 
 abstract class ProductLocalDataSource {
-  /// Gets the cached list of [ProductModel] from the last API call.
-  ///
-  /// Throws [CacheException] if no cached data is present.
   Future<List<ProductModel>> getLastProductList();
-
-  /// Gets the cached [ProductModel] by its ID.
-  ///
-  /// Throws [CacheException] if the product is not found.
   Future<ProductModel> getProductById(String id);
-
-  /// Caches a list of products for later retrieval.
   Future<void> cacheProductList(List<ProductModel> products);
-
-  /// Caches a single product.
   Future<void> cacheProduct(ProductModel product);
-
-  /// Deletes a cached product by ID.
   Future<void> deleteProduct(String id);
 }
 
 // ignore: constant_identifier_names
 const CACHED_PRODUCT_LIST = 'CACHED_PRODUCT_LIST';
 
-// ✅ IMPLEMENTATION
 class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   final SharedPreferences sharedPreferences;
 
   ProductLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<List<ProductModel>> getLastProductList() {
-    final jsonString = sharedPreferences.getString(CACHED_PRODUCT_LIST);
-
-    if (jsonString != null) {
-      final List<dynamic> decodedJson = json.decode(jsonString);
-      final List<ProductModel> productList = decodedJson
-          .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
-          .toList();
-      return Future.value(productList);
+  Future<List<ProductModel>> getLastProductList() async {
+    final productList = await _readCachedProductList();
+    if (productList != null) {
+      return productList;
     } else {
       throw CacheException();
     }
   }
 
   @override
-  Future<ProductModel> getProductById(String id) {
-    final jsonString = sharedPreferences.getString('CACHED_PRODUCT_LIST');
+  Future<ProductModel> getProductById(String id) async {
+    final productList = await _readCachedProductList();
 
-    if (jsonString != null) {
-      final List<dynamic> decodedList = json.decode(jsonString);
-
+    if (productList != null) {
       try {
-        final productMap = decodedList.firstWhere(
-          (item) => item['id'] == id,
-          orElse: () => throw CacheException(),
-        );
-
-        return Future.value(ProductModel.fromJson(productMap));
-      } catch (e) {
+        return productList.firstWhere((product) => product.id == id);
+      } catch (_) {
         throw CacheException();
       }
     } else {
@@ -73,57 +47,45 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   }
 
   @override
-  Future<bool> cacheProductList(List<ProductModel> products) {
-    final jsonString = json.encode(products.map((p) => p.toJson()).toList());
-    return sharedPreferences.setString('CACHED_PRODUCT_LIST', jsonString);
+  Future<void> cacheProductList(List<ProductModel> products) async {
+    await _writeProductListToCache(products);
   }
 
   @override
   Future<void> cacheProduct(ProductModel product) async {
-    final jsonString = sharedPreferences.getString('CACHED_PRODUCT_LIST');
-    List<ProductModel> currentList = [];
-
-    if (jsonString != null) {
-      final List<dynamic> jsonList = json.decode(jsonString);
-      currentList = jsonList
-          .map((item) => ProductModel.fromJson(item))
-          .toList();
-    }
-
-    // Remove any product with same ID (to avoid duplicates)
+    final currentList = await _readCachedProductList() ?? [];
     currentList.removeWhere((p) => p.id == product.id);
-
-    // Add the new product
     currentList.add(product);
-
-    final updatedJson = json.encode(
-      currentList.map((p) => p.toJson()).toList(),
-    );
-
-    await sharedPreferences.setString('CACHED_PRODUCT_LIST', updatedJson);
+    await _writeProductListToCache(currentList);
   }
 
   @override
   Future<void> deleteProduct(String id) async {
-    final jsonString = sharedPreferences.getString('CACHED_PRODUCT_LIST');
+    final currentList = await _readCachedProductList();
 
-    if (jsonString != null) {
-      final List<dynamic> jsonList = json.decode(jsonString);
-      final List<ProductModel> currentList = jsonList
-          .map((item) => ProductModel.fromJson(item))
-          .toList();
-
+    if (currentList != null) {
       final updatedList = currentList
           .where((product) => product.id != id)
           .toList();
-
-      final updatedJson = json.encode(
-        updatedList.map((product) => product.toJson()).toList(),
-      );
-
-      await sharedPreferences.setString('CACHED_PRODUCT_LIST', updatedJson);
+      await _writeProductListToCache(updatedList);
     } else {
       throw CacheException();
     }
+  }
+
+  // 🔁 Reusable helper: Read list from cache
+  Future<List<ProductModel>?> _readCachedProductList() async {
+    final jsonString = sharedPreferences.getString(CACHED_PRODUCT_LIST);
+    if (jsonString != null) {
+      final List<dynamic> decodedJson = json.decode(jsonString);
+      return decodedJson.map((item) => ProductModel.fromJson(item)).toList();
+    }
+    return null;
+  }
+
+  // 🔁 Reusable helper: Write list to cache
+  Future<void> _writeProductListToCache(List<ProductModel> products) async {
+    final jsonString = json.encode(products.map((p) => p.toJson()).toList());
+    await sharedPreferences.setString(CACHED_PRODUCT_LIST, jsonString);
   }
 }

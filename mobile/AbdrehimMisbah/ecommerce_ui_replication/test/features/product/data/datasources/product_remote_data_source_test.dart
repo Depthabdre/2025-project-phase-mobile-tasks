@@ -16,387 +16,264 @@ import 'product_remote_data_source_test.mocks.dart';
 void main() {
   late ProductRemoteDataSourceImpl dataSource;
   late MockClient mockHttpClient;
+  const baseUrl =
+      'https://g5-flutter-learning-path-be.onrender.com/api/v1/products';
+  const headers = {'Content-Type': 'application/json'};
+
+  // Shared product model
+  const tProductModel = ProductModel(
+    id: '1',
+    name: 'PC',
+    imageUrl: 'dummy1.jpeg',
+    price: 123,
+    description: 'long description',
+  );
+
+  // Helpers
+  void mockGetResponse(String fixtureFile, {int statusCode = 200}) {
+    when(
+      mockHttpClient.get(any, headers: anyNamed('headers')),
+    ).thenAnswer((_) async => http.Response(fixture(fixtureFile), statusCode));
+  }
+
+  void mockPutResponse({int statusCode = 200}) {
+    when(
+      mockHttpClient.put(
+        any,
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+      ),
+    ).thenAnswer((_) async => http.Response('', statusCode));
+  }
+
+  void mockDeleteResponse({int statusCode = 200}) {
+    when(
+      mockHttpClient.delete(any, headers: anyNamed('headers')),
+    ).thenAnswer((_) async => http.Response('', statusCode));
+  }
+
+  void mockMultipartSend({required int statusCode}) {
+    when(mockHttpClient.send(any)).thenAnswer(
+      (_) async =>
+          http.StreamedResponse(Stream.value(utf8.encode('')), statusCode),
+    );
+  }
+
+  Future<File> createDummyImage(String path) async {
+    final file = File(path);
+    await file.create(recursive: true);
+    await file.writeAsBytes([1, 2, 3]);
+    return file;
+  }
 
   setUp(() {
     mockHttpClient = MockClient();
     dataSource = ProductRemoteDataSourceImpl(client: mockHttpClient);
   });
 
-  // ✅ These helper methods are defined inside main(), but OUTSIDE test()
-  void setUpMockHttpClientSuccess200() {
-    when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
-      (_) async => http.Response(fixture('product_remote.json'), 200),
-    );
-  }
-
-  void setUpMockHttpClientFailure404() {
-    when(
-      mockHttpClient.get(any, headers: anyNamed('headers')),
-    ).thenAnswer((_) async => http.Response('Something went wrong', 404));
-  }
-
-  void setUpMockHttpClientSuccess200WithList() {
-    when(
-      mockHttpClient.get(any, headers: anyNamed('headers')),
-    ).thenAnswer((_) async => http.Response(fixture('product_list.json'), 200));
-  }
-
   group('getProductById', () {
     final tId = '6672776eb905525c145fe0bb';
 
-    test(
-      'should perform a GET request with product ID in the URL and application/json header',
-      () async {
-        // arrange
-        setUpMockHttpClientSuccess200();
+    test('should perform a GET request with correct URL and headers', () async {
+      mockGetResponse('product_remote.json');
 
-        // act
-        await dataSource.getProductById(tId);
+      await dataSource.getProductById(tId);
 
-        // assert
-        verify(
-          mockHttpClient.get(
-            Uri.parse(
-              'https://g5-flutter-learning-path-be.onrender.com/api/v1/products/$tId',
-            ),
-            headers: {'Content-Type': 'application/json'},
-          ),
-        );
-      },
-    );
+      verify(mockHttpClient.get(Uri.parse('$baseUrl/$tId'), headers: headers));
+    });
 
-    final tProductModel = ProductModel.fromJson(
-      (json.decode(fixture('product_remote.json'))
-          as Map<String, dynamic>)['data'],
-    );
+    test('should return ProductModel when response is 200', () async {
+      mockGetResponse('product_remote.json');
 
-    test(
-      'should return ProductModel when the response code is 200 (success)',
-      () async {
-        // arrange
-        setUpMockHttpClientSuccess200();
+      final expected = ProductModel.fromJson(
+        (json.decode(fixture('product_remote.json'))
+            as Map<String, dynamic>)['data'],
+      );
 
-        // act
-        final result = await dataSource.getProductById(tId);
+      final result = await dataSource.getProductById(tId);
 
-        // assert
-        expect(result, equals(tProductModel));
-      },
-    );
+      expect(result, equals(expected));
+    });
 
-    test(
-      'should throw ServerException when the response code is not 200',
-      () async {
-        // arrange
-        setUpMockHttpClientFailure404();
+    test('should throw ServerException when response is not 200', () async {
+      mockGetResponse('product_remote.json', statusCode: 404);
 
-        // act
-        final call = dataSource.getProductById;
-
-        // assert
-        expect(() => call(tId), throwsA(const TypeMatcher<ServerException>()));
-      },
-    );
+      expect(
+        () => dataSource.getProductById(tId),
+        throwsA(isA<ServerException>()),
+      );
+    });
   });
 
   group('getAllProducts', () {
-    final List<dynamic> jsonList =
-        (json.decode(fixture('product_list.json'))
-            as Map<String, dynamic>)['data'];
+    test('should perform a GET request with correct URL and headers', () async {
+      mockGetResponse('product_list.json');
 
-    final tProductModelList = jsonList
-        .map((jsonItem) => ProductModel.fromJson(jsonItem))
-        .toList();
+      await dataSource.getAllProducts();
 
-    test(
-      'should perform a GET request on /products with application/json header',
-      () async {
-        setUpMockHttpClientSuccess200WithList();
+      verify(mockHttpClient.get(Uri.parse(baseUrl), headers: headers));
+    });
 
-        await dataSource.getAllProducts();
+    test('should return list of ProductModels when response is 200', () async {
+      mockGetResponse('product_list.json');
 
-        verify(
-          mockHttpClient.get(
-            Uri.parse('https://api.yourapp.com/products'),
-            headers: {'Content-Type': 'application/json'},
-          ),
-        );
-      },
-    );
+      final List<ProductModel> expected =
+          (json.decode(fixture('product_list.json'))['data'] as List)
+              .map((e) => ProductModel.fromJson(e))
+              .toList();
 
-    test(
-      'should return list of ProductModels when response code is 200',
-      () async {
-        setUpMockHttpClientSuccess200WithList();
+      final result = await dataSource.getAllProducts();
 
-        final result = await dataSource.getAllProducts();
+      expect(result, equals(expected));
+    });
 
-        expect(result, equals(tProductModelList));
-      },
-    );
+    test('should throw ServerException when response is not 200', () async {
+      mockGetResponse('product_list.json', statusCode: 404);
 
-    test(
-      'should throw ServerException when response code is not 200',
-      () async {
-        setUpMockHttpClientFailure404();
-
-        final call = dataSource.getAllProducts;
-
-        expect(() => call(), throwsA(const TypeMatcher<ServerException>()));
-      },
-    );
+      expect(
+        () => dataSource.getAllProducts(),
+        throwsA(isA<ServerException>()),
+      );
+    });
   });
 
   group('createProduct', () {
-    late ProductRemoteDataSourceImpl dataSource;
-    late MockClient mockHttpClient;
+    late File imageFile;
     late http.MultipartRequest capturedRequest;
 
-    // A sample ProductModel to use across tests
-    const tProductModel = ProductModel(
-      id: '1',
-      name: 'PC',
-      imageUrl: 'dummy1.jpeg',
-      price: 123,
-      description: 'long description',
-    );
+    setUp(() async {
+      imageFile = await createDummyImage(tProductModel.imageUrl);
+    });
 
-    setUp(() {
-      mockHttpClient = MockClient();
-      dataSource = ProductRemoteDataSourceImpl(client: mockHttpClient);
+    tearDown(() async {
+      if (await imageFile.exists()) await imageFile.delete();
     });
 
     test('should send a multipart POST request with correct data', () async {
-      // Arrange: create dummy file before anything else
-      final file = File(tProductModel.imageUrl);
-      await file.create(recursive: true);
-      await file.writeAsBytes([1, 2, 3]);
+      mockMultipartSend(statusCode: 201);
 
-      // Stub send() to capture the request and simulate 201
       when(mockHttpClient.send(any)).thenAnswer((invocation) async {
         capturedRequest =
             invocation.positionalArguments[0] as http.MultipartRequest;
         return http.StreamedResponse(Stream.value(utf8.encode('')), 201);
       });
 
-      // Act
       await dataSource.createProduct(tProductModel);
 
-      // Assert URL and method
-      expect(
-        capturedRequest.url.toString(),
-        equals(
-          'https://g5-flutter-learning-path-be.onrender.com/api/v1/products',
-        ),
-      );
+      expect(capturedRequest.url.toString(), equals(baseUrl));
       expect(capturedRequest.method, equals('POST'));
-
-      // Assert fields (price may come as '123.0')
-      expect(capturedRequest.fields['name'], equals('PC'));
-      expect(capturedRequest.fields['description'], equals('long description'));
-      expect(capturedRequest.fields['price'], equals('123.0'));
-
-      // Assert file attachment
+      expect(capturedRequest.fields['name'], equals(tProductModel.name));
+      expect(
+        capturedRequest.fields['description'],
+        equals(tProductModel.description),
+      );
+      expect(
+        capturedRequest.fields['price'],
+        equals(tProductModel.price.toString()),
+      );
       expect(capturedRequest.files.length, equals(1));
       expect(capturedRequest.files.first.field, equals('image'));
-
-      // Clean up
-      await file.delete();
     });
 
-    test('should complete normally when status code is 201', () async {
-      // Arrange: create dummy file first
-      final file = File(tProductModel.imageUrl);
-      await file.create(recursive: true);
-      await file.writeAsBytes([1, 2, 3]);
+    test('should complete normally when status is 201', () async {
+      mockMultipartSend(statusCode: 201);
 
-      when(mockHttpClient.send(any)).thenAnswer(
-        (_) async => http.StreamedResponse(Stream.value(utf8.encode('')), 201),
-      );
-
-      // Act & Assert: wait for completion before deleting
       await expectLater(dataSource.createProduct(tProductModel), completes);
-
-      // Clean up
-      await file.delete();
     });
 
-    test('should throw ServerException on failure status code', () async {
-      // Arrange: create dummy file
-      final file = File(tProductModel.imageUrl);
-      await file.create(recursive: true);
-      await file.writeAsBytes([1, 2, 3]);
+    test('should throw ServerException on error response', () async {
+      mockMultipartSend(statusCode: 400);
 
-      when(mockHttpClient.send(any)).thenAnswer(
-        (_) async => http.StreamedResponse(Stream.value(utf8.encode('')), 400),
-      );
-
-      // Act & Assert: catch ServerException, then delete
-      await expectLater(
+      expect(
         () => dataSource.createProduct(tProductModel),
         throwsA(isA<ServerException>()),
       );
-
-      await file.delete();
     });
 
     test('should throw exception if image file not found', () async {
-      // Ensure file does not exist
       final file = File(tProductModel.imageUrl);
       if (await file.exists()) await file.delete();
 
-      // Act & Assert (no file to delete)
-      await expectLater(
+      expect(
         () => dataSource.createProduct(tProductModel),
         throwsA(
-          predicate(
-            (e) =>
-                e is Exception && e.toString().contains('Image file not found'),
-          ),
+          predicate((e) => e.toString().contains('Image file not found')),
         ),
       );
     });
   });
 
   group('updateProduct', () {
-    final tProductModel = const ProductModel(
+    final updatedProduct = const ProductModel(
       id: '6672940692adcb386d593686',
       name: 'TV',
-      imageUrl: 'https://example.com/image.png', // Not used in update
+      imageUrl: 'not-used-in-update',
       price: 123.4,
       description: "36' TV",
     );
 
-    void setUpMockHttpClientSuccess() {
-      when(
+    test('should perform PUT with correct URL, headers, and body', () async {
+      mockPutResponse();
+
+      await dataSource.updateProduct(updatedProduct);
+
+      final expectedBody = json.encode({
+        'name': updatedProduct.name,
+        'description': updatedProduct.description,
+        'price': updatedProduct.price,
+      });
+
+      verify(
         mockHttpClient.put(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
+          Uri.parse('$baseUrl/${updatedProduct.id}'),
+          headers: headers,
+          body: expectedBody,
         ),
-      ).thenAnswer((_) async => http.Response('', 200));
-    }
-
-    void setUpMockHttpClientFailure() {
-      when(
-        mockHttpClient.put(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        ),
-      ).thenAnswer((_) async => http.Response('Error', 400));
-    }
-
-    test(
-      'should perform a PUT request with correct URL, headers, and body',
-      () async {
-        // arrange
-        setUpMockHttpClientSuccess();
-
-        // act
-        await dataSource.updateProduct(tProductModel);
-
-        // assert
-        final expectedBody = json.encode({
-          'name': 'TV',
-          'description': "36' TV",
-          'price': 123.4,
-        });
-
-        verify(
-          mockHttpClient.put(
-            Uri.parse(
-              'https://g5-flutter-learning-path-be.onrender.com/api/v1/products/${tProductModel.id}',
-            ),
-            headers: {'Content-Type': 'application/json'},
-            body: expectedBody,
-          ),
-        );
-      },
-    );
-
-    test('should complete normally when status code is 200', () async {
-      // arrange
-      setUpMockHttpClientSuccess();
-
-      // act
-      final call = dataSource.updateProduct(tProductModel);
-
-      // assert
-      expect(call, completes);
+      );
     });
 
-    test('should throw ServerException when status code is not 200', () async {
-      // arrange
-      setUpMockHttpClientFailure();
+    test('should complete normally when status code is 200', () async {
+      mockPutResponse();
 
-      // act
-      final call = dataSource.updateProduct;
+      expect(dataSource.updateProduct(updatedProduct), completes);
+    });
 
-      // assert
-      expect(() => call(tProductModel), throwsA(isA<ServerException>()));
+    test('should throw ServerException when response is not 200', () async {
+      mockPutResponse(statusCode: 400);
+
+      expect(
+        () => dataSource.updateProduct(updatedProduct),
+        throwsA(isA<ServerException>()),
+      );
     });
   });
 
   group('deleteProduct', () {
-    final tId = '6672940692adcb386d593686'; // String ID now
+    final tId = '6672940692adcb386d593686';
 
-    void setUpMockHttpClientSuccess() {
-      when(
-        mockHttpClient.delete(any, headers: anyNamed('headers')),
-      ).thenAnswer((_) async => http.Response('', 200)); // Success
-    }
+    test('should perform DELETE with correct URL and headers', () async {
+      mockDeleteResponse();
 
-    void setUpMockHttpClientFailure() {
-      when(
-        mockHttpClient.delete(any, headers: anyNamed('headers')),
-      ).thenAnswer((_) async => http.Response('Error', 404)); // Failure
-    }
+      await dataSource.deleteProduct(tId);
 
-    test(
-      'should perform a DELETE request with correct URL and headers',
-      () async {
-        // arrange
-        setUpMockHttpClientSuccess();
-
-        // act
-        await dataSource.deleteProduct(tId);
-
-        // assert
-        verify(
-          mockHttpClient.delete(
-            Uri.parse(
-              'https://g5-flutter-learning-path-be.onrender.com/api/v1/products/$tId',
-            ),
-            headers: {'Content-Type': 'application/json'},
-          ),
-        );
-      },
-    );
-
-    test('should complete normally when response code is 200', () async {
-      // arrange
-      setUpMockHttpClientSuccess();
-
-      // act
-      final call = dataSource.deleteProduct(tId);
-
-      // assert
-      expect(call, completes);
+      verify(
+        mockHttpClient.delete(Uri.parse('$baseUrl/$tId'), headers: headers),
+      );
     });
 
-    test(
-      'should throw ServerException when the response code is not 200',
-      () async {
-        // arrange
-        setUpMockHttpClientFailure();
+    test('should complete normally when status code is 200', () async {
+      mockDeleteResponse();
 
-        // act
-        final call = dataSource.deleteProduct;
+      expect(dataSource.deleteProduct(tId), completes);
+    });
 
-        // assert
-        expect(() => call(tId), throwsA(isA<ServerException>()));
-      },
-    );
+    test('should throw ServerException when status code is not 200', () async {
+      mockDeleteResponse(statusCode: 404);
+
+      expect(
+        () => dataSource.deleteProduct(tId),
+        throwsA(isA<ServerException>()),
+      );
+    });
   });
 }

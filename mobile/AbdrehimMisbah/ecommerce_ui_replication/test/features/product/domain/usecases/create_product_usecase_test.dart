@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:ecommerce_ui_replication/core/error/failure.dart';
+import 'package:ecommerce_ui_replication/core/usecases/usecase_params.dart';
 import 'package:ecommerce_ui_replication/features/product/domain/entities/product.dart';
 import 'package:ecommerce_ui_replication/features/product/domain/repositories/product_repository.dart';
 import 'package:ecommerce_ui_replication/features/product/domain/usecases/create_product_usecase.dart';
@@ -29,7 +30,7 @@ void main() {
     () async {
       // Arrange
       final testProduct = const Product(
-        id: 1,
+        id: '1',
         imageUrl: 'https://example.com/image.png',
         name: 'Test Product',
         price: 99.99,
@@ -41,7 +42,7 @@ void main() {
       ).thenAnswer((_) async => const Right(unit));
 
       // Act
-      final result = await usecase(Params(testProduct));
+      final result = await usecase(ProductParams(testProduct));
 
       // Assert
       expect(result, const Right(unit)); // check the result is correct
@@ -56,7 +57,7 @@ void main() {
     () async {
       // Arrange
       final testProduct = const Product(
-        id: 1,
+        id: '1',
         imageUrl: 'https://example.com/image.png',
         name: 'Test Product',
         price: 99.99,
@@ -68,7 +69,7 @@ void main() {
       ).thenAnswer((_) async => Left(ServerFailure()));
 
       // Act
-      final result = await usecase(Params(testProduct));
+      final result = await usecase(ProductParams(testProduct));
 
       // Assert
       expect(result, Left(ServerFailure())); // check the result is failure

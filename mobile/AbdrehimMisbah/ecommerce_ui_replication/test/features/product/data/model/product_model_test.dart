@@ -7,7 +7,7 @@ import '../../../../fixtures/fixture_reader.dart';
 
 void main() {
   const tProductModel = ProductModel(
-    id: 1,
+    id: '1',
     imageUrl: 'https://example.com/image.jpg',
     name: 'Test Product',
     price: 19.99,
@@ -32,7 +32,7 @@ void main() {
     final result = tProductModel.toJson();
     // assert
     final expectedMap = {
-      'id': 1,
+      'id': '1',
       'imageUrl': 'https://example.com/image.jpg',
       'name': 'Test Product',
       'price': 19.99,

@@ -9,6 +9,9 @@ class ProductModel extends Product {
     required super.description,
   });
 
+  @override
+  List<Object> get props => [id];
+
   // ✅ Add this method to convert from domain entity → model
   factory ProductModel.fromEntity(Product product) {
     return ProductModel(
@@ -19,10 +22,11 @@ class ProductModel extends Product {
       description: product.description,
     );
   }
+
   // 🧠 Important: fromJson converts Map → ProductModel
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] ,
+      id: json['id'],
       name: json['name'],
       imageUrl: json['imageUrl'],
       price: (json['price'] as num).toDouble(), // handles 1 or 1.0

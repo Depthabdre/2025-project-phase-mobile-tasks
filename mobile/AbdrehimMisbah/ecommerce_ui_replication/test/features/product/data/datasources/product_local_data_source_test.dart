@@ -67,14 +67,14 @@ void main() {
   group('cacheProductList', () {
     final tProductModelList = [
       const ProductModel(
-        id: 1,
+        id: '1',
         name: 'Product 1',
         imageUrl: 'url1',
         price: 10.0,
         description: 'desc 1',
       ),
       const ProductModel(
-        id: 2,
+        id: '2',
         name: 'Product 2',
         imageUrl: 'url2',
         price: 20.0,
@@ -113,7 +113,7 @@ void main() {
   group('getProductById', () {
     // Example product model with id = 1
     final tProductModel = const ProductModel(
-      id: 1,
+      id: '1',
       name: 'Test Product',
       imageUrl: 'https://example.com/image.png',
       price: 99.99,
@@ -135,7 +135,7 @@ void main() {
         ).thenReturn(expectedJsonString);
 
         // act
-        final result = await dataSource.getProductById(1);
+        final result = await dataSource.getProductById('1');
 
         // assert
         expect(result, equals(tProductModel));
@@ -152,7 +152,7 @@ void main() {
       final call = dataSource.getProductById;
 
       // assert
-      expect(() => call(1), throwsA(isA<CacheException>()));
+      expect(() => call('1'), throwsA(isA<CacheException>()));
     });
 
     test(
@@ -171,21 +171,21 @@ void main() {
         final call = dataSource.getProductById;
 
         // assert
-        expect(() => call(99), throwsA(isA<CacheException>()));
+        expect(() => call('99'), throwsA(isA<CacheException>()));
       },
     );
   });
 
   group('deleteProduct', () {
     final tProduct1 = const ProductModel(
-      id: 1,
+      id: '1',
       name: 'Product 1',
       imageUrl: 'url1',
       price: 10.0,
       description: 'Desc 1',
     );
     final tProduct2 = const ProductModel(
-      id: 2,
+      id: '2',
       name: 'Product 2',
       imageUrl: 'url2',
       price: 20.0,
@@ -208,7 +208,7 @@ void main() {
         ).thenAnswer((_) async => true);
 
         // act
-        await dataSource.deleteProduct(1);
+        await dataSource.deleteProduct('1');
 
         // assert
         final updatedList = [tProduct2];
@@ -229,13 +229,13 @@ void main() {
       final call = dataSource.deleteProduct;
 
       // assert
-      expect(() => call(1), throwsA(isA<CacheException>()));
+      expect(() => call('1'), throwsA(isA<CacheException>()));
     });
   });
 
   group('cacheProduct', () {
     final existingProduct = const ProductModel(
-      id: 1,
+      id: '1',
       name: 'Old Product',
       imageUrl: 'old_url',
       price: 99.9,
@@ -243,7 +243,7 @@ void main() {
     );
 
     final newProduct = const ProductModel(
-      id: 2,
+      id: '2',
       name: 'New Product',
       imageUrl: 'new_url',
       price: 49.9,

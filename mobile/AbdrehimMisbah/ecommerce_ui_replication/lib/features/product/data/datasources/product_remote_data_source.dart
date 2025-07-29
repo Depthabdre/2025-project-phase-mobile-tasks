@@ -7,85 +7,63 @@ import '../../../../core/error/exception.dart';
 import '../models/product_model.dart';
 
 abstract class ProductRemoteDataSource {
-  /// Calls the API to get all products.
-  ///
-  /// Throws a [ServerException] for all error codes.
   Future<List<ProductModel>> getAllProducts();
-
-  /// Calls the API to get a product by ID.
-  ///
-  /// Throws a [ServerException] for all error codes.
   Future<ProductModel> getProductById(String id);
-
-  /// Posts product to the API.
   Future<void> createProduct(ProductModel product);
-
-  /// Updates product on the API.
   Future<void> updateProduct(ProductModel product);
-
-  /// Deletes product from the API.
   Future<void> deleteProduct(String id);
 }
+
+// ✅ Constants for endpoints
+const String _baseUrl =
+    'https://g5-flutter-learning-path-be.onrender.com/api/v1/products';
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final http.Client client;
 
   ProductRemoteDataSourceImpl({required this.client});
 
-  Future<Map<String, dynamic>> _getJsonFromUrl(Uri url) async {
+  // ✅ Unified GET handler
+  Future<http.Response> _getRequest(Uri url) async {
     final response = await client.get(
       url,
       headers: {'Content-Type': 'application/json'},
     );
-
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return response;
     } else {
       throw ServerException();
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getListFromUrl(Uri url) async {
-    final response = await client.get(
+  // ✅ Unified PUT handler
+  Future<void> _putRequest(Uri url, Map<String, dynamic> body) async {
+    final response = await client.put(
       url,
       headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
     );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      final List<dynamic> jsonList = jsonResponse['data'];
-      return jsonList.cast<Map<String, dynamic>>();
-    } else {
+    if (response.statusCode != 200) {
       throw ServerException();
     }
   }
 
-  @override
-  Future<List<ProductModel>> getAllProducts() async {
-    final jsonList = await _getListFromUrl(
-      Uri.parse('https://api.yourapp.com/products'),
+  // ✅ Unified DELETE handler
+  Future<void> _deleteRequest(Uri url) async {
+    final response = await client.delete(
+      url,
+      headers: {'Content-Type': 'application/json'},
     );
-    return jsonList.map((jsonMap) => ProductModel.fromJson(jsonMap)).toList();
+
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
   }
 
-  @override
-  Future<ProductModel> getProductById(String id) async {
-    final jsonMap = await _getJsonFromUrl(
-      Uri.parse(
-        'https://g5-flutter-learning-path-be.onrender.com/api/v1/products/$id',
-      ),
-    );
-
-    final data = jsonMap['data'] as Map<String, dynamic>;
-
-    return ProductModel.fromJson(data);
-  }
-
-  @override
-  Future<void> createProduct(ProductModel product) async {
-    final uri = Uri.parse(
-      'https://g5-flutter-learning-path-be.onrender.com/api/v1/products',
-    );
+  // ✅ Multipart request for file upload
+  Future<void> _postMultipartProduct(ProductModel product) async {
+    final uri = Uri.parse(_baseUrl);
 
     final request = http.MultipartRequest('POST', uri)
       ..fields['name'] = product.name
@@ -101,7 +79,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       await http.MultipartFile.fromPath('image', imageFile.path),
     );
 
-    // Use the injected client to send the request so we can mock it in tests
     final streamedResponse = await client.send(request);
     final response = await http.Response.fromStream(streamedResponse);
 
@@ -111,39 +88,37 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<void> updateProduct(ProductModel product) async {
-    final url = Uri.parse(
-      'https://g5-flutter-learning-path-be.onrender.com/api/v1/products/${product.id}',
-    );
+  Future<List<ProductModel>> getAllProducts() async {
+    final response = await _getRequest(Uri.parse(_baseUrl));
+    final Map<String, dynamic> decoded = json.decode(response.body);
+    final List<dynamic> jsonList = decoded['data'];
 
-    final body = json.encode({
+    return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  @override
+  Future<ProductModel> getProductById(String id) async {
+    final response = await _getRequest(Uri.parse('$_baseUrl/$id'));
+    final Map<String, dynamic> decoded = json.decode(response.body);
+    return ProductModel.fromJson(decoded['data']);
+  }
+
+  @override
+  Future<void> createProduct(ProductModel product) async {
+    await _postMultipartProduct(product);
+  }
+
+  @override
+  Future<void> updateProduct(ProductModel product) async {
+    await _putRequest(Uri.parse('$_baseUrl/${product.id}'), {
       'name': product.name,
       'description': product.description,
       'price': product.price,
     });
-
-    final response = await client.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    );
-
-    if (response.statusCode != 200) {
-      throw ServerException();
-    }
   }
 
   @override
   Future<void> deleteProduct(String id) async {
-    final response = await client.delete(
-      Uri.parse(
-        'https://g5-flutter-learning-path-be.onrender.com/api/v1/products/$id',
-      ),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode != 200) {
-      throw ServerException();
-    }
+    await _deleteRequest(Uri.parse('$_baseUrl/$id'));
   }
 }
