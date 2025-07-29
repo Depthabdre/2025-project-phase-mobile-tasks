@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/product_data.dart';
-import '../widgets/reusable.dart';
+
+import '../../domain/entities/product.dart';
+import '../widgets/product_card_item.dart';
+
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
@@ -40,9 +42,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ...productCard(
+              ProductCardItem(
                 context: context,
-                products: [product], // wrap single product in a list
+                product: product, // wrap single product in a list
                 isInDetailPage: true,
               ),
               // 4. "Size" Text

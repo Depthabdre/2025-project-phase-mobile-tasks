@@ -1,8 +1,8 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
 
-import '../widgets/product_data.dart';
-import '../widgets/reusable.dart';
+import '../../domain/entities/product.dart';
+import '../widgets/label_text.dart';
 
 class AddUpdatePage extends StatefulWidget {
   final Product? product; // ✅ Declare the field
@@ -30,7 +30,9 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
     final product = widget.product;
     if (product != null) {
       nameController.text = product.name;
-      categoryController.text = product.type;
+      categoryController.text = product.description;
+
+      /// it will check later
       priceController.text = product.price.toString();
       descriptionController.text = product.description;
     }
@@ -67,11 +69,12 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
     }
 
     final newProduct = Product(
+      id: '1',
       name: name,
-      type: category,
-      image: 'images/default.jpeg', // Replace with actual path if available
+
+      imageUrl: 'images/default.jpeg', // Replace with actual path if available
       price: priceValue,
-      rating: 4.0, // Default value
+
       description: description,
     );
 
