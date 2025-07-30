@@ -6,10 +6,10 @@ import '../../../../core/usecases/usecase_params.dart';
 import '../entities/product.dart';
 import '../repositories/product_repository.dart';
 
-class ViewProductUsecase extends UseCase<Product, IdParams> {
+class ViewProductByIdUsecase extends UseCase<Product, IdParams> {
   final ProductRepository repository;
 
-  ViewProductUsecase(this.repository);
+  ViewProductByIdUsecase(this.repository);
 
   @override
   Future<Either<Failure, Product>> call(IdParams params) async {
