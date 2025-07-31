@@ -7,37 +7,37 @@ sealed class ProductEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadAllProducts extends ProductEvent {
-  const LoadAllProducts();
+class LoadAllProductEvent extends ProductEvent {
+  const LoadAllProductEvent();
 }
 
-class LoadProductById extends ProductEvent {
+class GetSingleProductEvent extends ProductEvent {
   final String id;
-  const LoadProductById(this.id);
+  const GetSingleProductEvent(this.id);
 
   @override
   List<Object?> get props => [id];
 }
 
-class AddProduct extends ProductEvent {
+class CreateProductEvent extends ProductEvent {
   final Product product;
-  const AddProduct(this.product);
+  const CreateProductEvent(this.product);
 
   @override
   List<Object?> get props => [product];
 }
 
-class UpdateProduct extends ProductEvent {
+class UpdateProductEvent extends ProductEvent {
   final Product product;
-  const UpdateProduct(this.product);
+  const UpdateProductEvent(this.product);
 
   @override
   List<Object?> get props => [product];
 }
 
-class DeleteProduct extends ProductEvent {
+class DeleteProductEvent extends ProductEvent {
   final String id;
-  const DeleteProduct(this.id);
+  const DeleteProductEvent(this.id);
 
   @override
   List<Object?> get props => [id];

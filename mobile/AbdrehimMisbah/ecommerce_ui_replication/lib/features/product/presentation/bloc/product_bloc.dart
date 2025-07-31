@@ -3,6 +3,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/error/failure.dart';
+import '../../../../core/usecases/usecase_params.dart';
 import '../../../../core/util/input_converter.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/usecases/create_product_usecase.dart';
@@ -13,11 +15,6 @@ import '../../domain/usecases/view_product_usecase.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';
-
-const String SERVER_FAILURE_MESSAGE = 'Server Failure';
-const String CACHE_FAILURE_MESSAGE = 'Cache Failure';
-const String INVALID_INPUT_FAILURE_MESSAGE =
-    'Invalid Input - The number must be a positive integer or zero.';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final CreateProductUsecase createProduct;
@@ -34,11 +31,140 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     required this.viewProduct,
     required this.viewSingleProduct,
     required this.inputConverter,
-  }) : super(ProductInitial()) {
-    on<AddProduct>((event, emit) {
-      // TODO: implement event handler
+  }) : super(IntialState()) {
+    on<CreateProductEvent>((event, emit) async {
       final priceString = event.product.price.toString();
       final inputEither = inputConverter.stringToUnsignedInteger(priceString);
+
+      await inputEither.fold(
+        (failure) async {
+          emit(const ErrorState(message: INVALID_INPUT_FAILURE_MESSAGE));
+        },
+        (parsedPrice) async {
+          emit(LoadingState());
+
+          // 1) await the create‐usecase result
+          final result = await createProduct(ProductParams(event.product));
+
+          // 2) await the fold so its async callbacks complete here
+          await result.fold(
+            (failure) async {
+              emit(ErrorState(message: _mapFailureToMessage(failure)));
+            },
+            (_) async {
+              // After successful creation, fetch the updated products list
+              final productsOrFailure = await viewProduct(NoParams());
+
+              // 3) and await this fold too
+              await productsOrFailure.fold(
+                (failure) async =>
+                    emit(ErrorState(message: _mapFailureToMessage(failure))),
+                (products) async =>
+                    emit(LoadedAllProductState(products: products)),
+              );
+            },
+          );
+        },
+      );
     });
+
+    on<LoadAllProductEvent>((event, emit) async {
+      emit(LoadingState());
+
+      final failureOrProducts = await viewProduct(NoParams());
+
+      failureOrProducts.fold(
+        (failure) => emit(ErrorState(message: _mapFailureToMessage(failure))),
+        (products) => emit(LoadedAllProductState(products: products)),
+      );
+    });
+
+    on<GetSingleProductEvent>((event, emit) async {
+      final inputEither = inputConverter.stringToUnsignedInteger(event.id);
+
+      await inputEither.fold(
+        (failure) async {
+          emit(const ErrorState(message: INVALID_INPUT_FAILURE_MESSAGE));
+        },
+        (parsedId) async {
+          emit(LoadingState());
+
+          final result = await viewSingleProduct(IdParams(parsedId.toString()));
+
+          result.fold(
+            (failure) =>
+                emit(ErrorState(message: _mapFailureToMessage(failure))),
+            (product) => emit(LoadedSingleProductState(product: product)),
+          );
+        },
+      );
+    });
+    on<UpdateProductEvent>((event, emit) async {
+      final priceString = event.product.price.toString();
+      final inputEither = inputConverter.stringToUnsignedInteger(priceString);
+
+      await inputEither.fold(
+        (failure) async {
+          emit(const ErrorState(message: INVALID_INPUT_FAILURE_MESSAGE));
+        },
+        (parsedPrice) async {
+          emit(LoadingState());
+
+          final result = await updateProduct(ProductParams(event.product));
+
+          await result.fold(
+            (failure) async =>
+                emit(ErrorState(message: _mapFailureToMessage(failure))),
+            (_) async {
+              final productsResult = await viewSingleProduct(
+                IdParams(event.product.id),
+              );
+
+              productsResult.fold(
+                (failure) =>
+                    emit(ErrorState(message: _mapFailureToMessage(failure))),
+                (products) => emit(LoadedSingleProductState(product: products)),
+              );
+            },
+          );
+        },
+      );
+    });
+    on<DeleteProductEvent>((event, emit) async {
+      emit(LoadingState());
+
+      final result = await deleteProduct(IdParams(event.id));
+
+      await result.fold(
+        (failure) async {
+          emit(ErrorState(message: _mapFailureToMessage(failure)));
+        },
+        (_) async {
+          final productsResult = await viewProduct(NoParams());
+
+          productsResult.fold(
+            (failure) =>
+                emit(ErrorState(message: _mapFailureToMessage(failure))),
+            (products) => emit(LoadedAllProductState(products: products)),
+          );
+        },
+      );
+    });
+  }
+}
+
+const String SERVER_FAILURE_MESSAGE = 'Server Failure';
+const String CACHE_FAILURE_MESSAGE = 'Cache Failure';
+const String INVALID_INPUT_FAILURE_MESSAGE =
+    'Invalid Input - The number must be a positive integer or zero.';
+
+String _mapFailureToMessage(Failure failure) {
+  switch (failure) {
+    case ServerFailure _:
+      return SERVER_FAILURE_MESSAGE;
+    case CacheFailure _:
+      return CACHE_FAILURE_MESSAGE;
+    default:
+      return 'Unexpected ErrorState';
   }
 }
