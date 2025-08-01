@@ -38,17 +38,21 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ViewProductUsecase(sl()));
 
   // Repository
-  sl.registerLazySingleton<ProductRepository>(() => ProductRepositoryImpl(
-        remoteDataSource: sl(),
-        localDataSource: sl(),
-        networkInfo: sl(),
-      ));
+  sl.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
 
   // Data sources
   sl.registerLazySingleton<ProductRemoteDataSource>(
-      () => ProductRemoteDataSourceImpl(client: sl()));
+    () => ProductRemoteDataSourceImpl(client: sl()),
+  );
   sl.registerLazySingleton<ProductLocalDataSource>(
-      () => ProductLocalDataSourceImpl(sharedPreferences: sl()));
+    () => ProductLocalDataSourceImpl(sharedPreferences: sl()),
+  );
 
   //! Core
   sl.registerLazySingleton(() => InputConverter());
@@ -59,9 +63,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton<InternetConnectionChecker>(
-  () => InternetConnectionChecker.createInstance(),
-
-);
-
+    () => InternetConnectionChecker.createInstance(),
+  );
 }
-
