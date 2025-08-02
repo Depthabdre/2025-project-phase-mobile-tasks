@@ -131,7 +131,7 @@ class SearchPage extends StatelessWidget {
                 children: [
                   buildLabelText('Category'),
                   const SizedBox(height: 8),
-                  buildInputBox(),
+                  // buildInputBox(controller:),
                   const SizedBox(height: 24),
                   buildLabelText('Price Range'),
                   const SizedBox(height: 8),

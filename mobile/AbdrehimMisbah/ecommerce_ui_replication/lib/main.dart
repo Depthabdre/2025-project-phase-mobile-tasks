@@ -1,11 +1,11 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
-import '../../../../core/router/app_router.dart';
-import './features/product/injection_container.dart' as di;
+import 'core/router/app_router.dart';
+import 'features/product/injection_container.dart' as di;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Important when awaiting in main()
-  await di.init(); // Wait for DI setup
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init(); // Setup Dependency Injection
   runApp(const MyApp());
 }
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      onGenerateRoute: AppRouter.generateRoute,
+      onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }
 }
