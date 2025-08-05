@@ -4,6 +4,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/network/network_info.dart';
+import '../../core/util/Uuid_generator.dart';
 import '../../core/util/input_converter.dart';
 import 'data/datasources/product_local_data_source.dart';
 import 'data/datasources/product_remote_data_source.dart';
@@ -28,6 +29,7 @@ Future<void> init() async {
       viewProduct: sl(),
       viewSingleProduct: sl(),
       inputConverter: sl(),
+      idGenerator: sl(),
     ),
   );
 
@@ -57,6 +59,7 @@ Future<void> init() async {
   //! Core
   sl.registerLazySingleton(() => InputConverter());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  sl.registerLazySingleton<IdGenerator>(() => UuidGenerator());
 
   //! External
   final sharedPreferences = await SharedPreferences.getInstance();

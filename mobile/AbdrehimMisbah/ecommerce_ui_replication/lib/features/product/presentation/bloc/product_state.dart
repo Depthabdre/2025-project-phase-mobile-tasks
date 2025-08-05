@@ -24,10 +24,9 @@ final class LoadedAllProductState extends ProductState {
 }
 
 final class LoadedSingleProductState extends ProductState {
-
   final Product product;
 
-  const LoadedSingleProductState ({required this.product});
+  const LoadedSingleProductState({required this.product});
 
   @override
   List<Object> get props => [product];

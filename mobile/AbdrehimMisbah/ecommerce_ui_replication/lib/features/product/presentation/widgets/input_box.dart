@@ -7,8 +7,10 @@ Widget buildInputBox({
   int maxLines = 1,
   String? hintText,
   Widget? suffixIcon,
+  Key? key,
 }) {
   return TextField(
+    key: key,
     controller: controller,
     keyboardType: keyboardType,
     maxLines: maxLines,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/initial_product.dart';
-import '../widgets/input_box.dart';
 import '../widgets/label_text.dart';
 import '../widgets/price_filter_slider.dart';
 import '../widgets/product_card_list.dart';

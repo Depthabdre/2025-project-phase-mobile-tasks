@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 
 import 'package:ecommerce_ui_replication/core/error/failure.dart';
 import 'package:ecommerce_ui_replication/core/usecases/usecase_params.dart';
+import 'package:ecommerce_ui_replication/core/util/Uuid_generator.dart';
 import 'package:ecommerce_ui_replication/core/util/input_converter.dart';
 import 'package:ecommerce_ui_replication/features/product/domain/entities/product.dart';
 import 'package:ecommerce_ui_replication/features/product/domain/usecases/create_product_usecase.dart';
@@ -25,6 +26,7 @@ import 'product_bloc_test.mocks.dart';
   ViewProductUsecase,
   ViewProductByIdUsecase,
   InputConverter,
+  IdGenerator,
 ])
 void main() {
   late ProductBloc bloc;
@@ -34,6 +36,7 @@ void main() {
   late MockViewProductUsecase mockViewProducts;
   late MockViewProductByIdUsecase mockViewProductById;
   late MockInputConverter mockInputConverter;
+  late MockIdGenerator mockIdGenerator;
 
   setUp(() {
     mockCreateProduct = MockCreateProductUsecase();
@@ -42,6 +45,7 @@ void main() {
     mockViewProducts = MockViewProductUsecase();
     mockViewProductById = MockViewProductByIdUsecase();
     mockInputConverter = MockInputConverter();
+    mockIdGenerator = MockIdGenerator();
     bloc = ProductBloc(
       createProduct: mockCreateProduct,
       deleteProduct: mockDeleteProductEvent,
@@ -49,6 +53,7 @@ void main() {
       viewProduct: mockViewProducts,
       viewSingleProduct: mockViewProductById,
       inputConverter: mockInputConverter,
+      idGenerator: mockIdGenerator,
     );
   });
 

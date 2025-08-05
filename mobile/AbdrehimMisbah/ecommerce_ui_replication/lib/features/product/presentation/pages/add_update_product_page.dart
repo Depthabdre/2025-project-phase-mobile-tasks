@@ -68,9 +68,7 @@ class _AddUpdateProductPageState extends State<AddUpdateProductPage> {
     }
 
     final product = Product(
-      id:
-          widget.product?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+      id: widget.product?.id ?? '',
       name: name,
       price: price,
       description: description,
@@ -79,7 +77,7 @@ class _AddUpdateProductPageState extends State<AddUpdateProductPage> {
           : 'https://via.placeholder.com/150',
     );
 
-    if (widget.product == null) {
+    if (!widget.isEditing) {
       context.read<ProductBloc>().add(CreateProductEvent(product));
     } else {
       context.read<ProductBloc>().add(UpdateProductEvent(product));
@@ -112,8 +110,16 @@ class _AddUpdateProductPageState extends State<AddUpdateProductPage> {
           );
         } else if (state is ErrorState) {
           _showError(state.message);
-        } else if (state is LoadedAllProductState) {
-          Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+        } else if (state is LoadedAllProductState && !widget.isEditing) {
+          // Created successfully
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product created successfully!')),
+          );
+        } else if (state is LoadedSingleProductState && widget.isEditing) {
+          // Updated successfully
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product updated successfully!')),
+          );
         }
       },
       child: Scaffold(
@@ -122,6 +128,7 @@ class _AddUpdateProductPageState extends State<AddUpdateProductPage> {
           title: Text(widget.isEditing ? 'Edit Product' : 'Add Product'),
         ),
         body: SingleChildScrollView(
+          key: const Key('productFormScrollView'),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,22 +145,32 @@ class _AddUpdateProductPageState extends State<AddUpdateProductPage> {
               const SizedBox(height: 16),
               buildLabelText('Image URL'),
               buildInputBox(
+                key: const Key('imageUrlField'), // Add this key
                 controller: imageUrlController,
                 hintText: 'https://...',
               ),
+
               const SizedBox(height: 16),
               buildLabelText('Name'),
-              buildInputBox(controller: nameController),
+              buildInputBox(
+                key: const Key('nameField'),
+                controller: nameController,
+              ),
               const SizedBox(height: 16),
               buildLabelText('Price'),
               buildInputBox(
+                key: const Key('priceField'),
                 controller: priceController,
                 keyboardType: TextInputType.number,
                 suffixIcon: const Icon(Icons.attach_money),
               ),
               const SizedBox(height: 16),
               buildLabelText('Description'),
-              buildInputBox(controller: descriptionController, maxLines: 4),
+              buildInputBox(
+                key: const Key('descriptionField'),
+                controller: descriptionController,
+                maxLines: 4,
+              ),
               const SizedBox(height: 24),
               BlocBuilder<ProductBloc, ProductState>(
                 builder: (context, state) {
@@ -162,6 +179,7 @@ class _AddUpdateProductPageState extends State<AddUpdateProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ElevatedButton(
+                        key: const Key('addUpdatButton'),
                         onPressed: isLoading ? null : _onSavePressed,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF3F51F3),
