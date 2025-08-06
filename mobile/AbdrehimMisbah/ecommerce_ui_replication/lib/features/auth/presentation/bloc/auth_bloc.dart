@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../core/error/failure.dart';
-import '../../../../core/util/input_converter.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/get_logged_in_user.dart';
 import '../../domain/usecases/login.dart';
@@ -17,14 +16,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Register register;
   final Logout logout;
   final GetLoggedInUser getLoggedInUser;
-  final InputConverter inputConverter;
 
   AuthBloc({
     required this.login,
     required this.register,
     required this.logout,
     required this.getLoggedInUser,
-    required this.inputConverter,
   }) : super(AuthInitial()) {
     on<LoginEvent>((event, emit) async {
       emit(AuthLoading());
