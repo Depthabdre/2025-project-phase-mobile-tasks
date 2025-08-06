@@ -48,7 +48,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         child: BlocConsumer<ProductBloc, ProductState>(
           listener: (context, state) {
             if (state is LoadedAllProductState) {
-              Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/products',
+                (_) => false,
+              );
             } else if (state is ErrorState) {
               ScaffoldMessenger.of(
                 context,

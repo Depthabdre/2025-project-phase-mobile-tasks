@@ -36,7 +36,7 @@ class AppRouter {
           ),
         );
 
-      case '/register':
+      case '/signup':
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => auth_di.sl<AuthBloc>(),
