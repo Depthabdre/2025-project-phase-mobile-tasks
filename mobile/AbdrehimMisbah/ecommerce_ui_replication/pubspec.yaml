@@ -123,6 +123,17 @@ flutter:
     - family: CaveatBrush
       fonts:
         - asset: fonts/CaveatBrush-Regular.ttf
-
+    - family: General Sans
+      fonts:
+        - asset: fonts/GeneralSans-Light.otf
+          weight: 300
+        - asset: fonts/GeneralSans-Regular.otf
+          weight: 400
+        - asset: fonts/GeneralSans-Medium.otf
+          weight: 500
+        - asset: fonts/GeneralSans-Semibold.otf
+          weight: 600
+        - asset: fonts/GeneralSans-Bold.otf
+          weight: 700
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
