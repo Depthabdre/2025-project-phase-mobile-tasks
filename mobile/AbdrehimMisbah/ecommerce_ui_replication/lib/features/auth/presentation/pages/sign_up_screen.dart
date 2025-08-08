@@ -26,8 +26,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     if (name.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
-        confirmPassword.isEmpty)
+        confirmPassword.isEmpty) {
       return;
+    }
     if (password != confirmPassword) return;
 
     context.read<AuthBloc>().add(

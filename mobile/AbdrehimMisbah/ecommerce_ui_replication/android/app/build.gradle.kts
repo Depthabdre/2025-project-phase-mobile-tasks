@@ -6,9 +6,11 @@ plugins {
 }
 
 android {
+      
+    ndkVersion = "27.1.12297006" 
     namespace = "com.example.ecommerce_ui_replication"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

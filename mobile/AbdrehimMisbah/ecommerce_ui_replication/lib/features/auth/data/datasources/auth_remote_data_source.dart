@@ -26,7 +26,7 @@ abstract class AuthRemoteDataSource {
 
 // 🔗 Base URL
 const String _baseUrl =
-    'https://g5-flutter-learning-path-be.onrender.com/api/v2';
+    'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v2';
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
@@ -67,6 +67,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'name': name, 'email': email, 'password': password}),
     );
+
+    print('🔸 Response status: ${response.statusCode}');
+    print('🔸 Response body: ${response.body}');
 
     if (response.statusCode == 201) {
       final decoded = json.decode(response.body);
