@@ -11,6 +11,10 @@ class UserModel extends User {
     return UserModel(id: user.id, name: user.name, email: user.email);
   }
 
+  User toEntity() {
+    return User(id: id, name: name, email: email);
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'], // matches backend response key

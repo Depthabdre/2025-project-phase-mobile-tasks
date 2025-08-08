@@ -25,7 +25,11 @@ class _EcomScreenState extends State<EcomScreen> {
           Navigator.pushReplacementNamed(
             context,
             '/home',
-          ); // ✅ Update route name if needed
+            arguments: {
+              'userName': state.user.name,
+              'userEmail': state.user.email,
+            },
+          );
         } else if (state is AuthUnauthenticated || state is AuthError) {
           Navigator.pushReplacementNamed(
             context,

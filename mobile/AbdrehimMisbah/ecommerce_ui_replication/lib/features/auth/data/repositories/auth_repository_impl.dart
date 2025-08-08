@@ -54,7 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
           email: email,
           password: password,
         );
-        return Right(user);
+        return Right(user.toEntity());
       } on ServerException {
         return Left(ServerFailure());
       }
@@ -79,7 +79,7 @@ class AuthRepositoryImpl implements AuthRepository {
       try {
         final token = await localDataSource.getCachedToken();
         final user = await remoteDataSource.getLoggedInUser(token: token);
-        return Right(user);
+        return Right(user.toEntity());
       } on CacheException {
         return Left(CacheFailure());
       } on ServerException {

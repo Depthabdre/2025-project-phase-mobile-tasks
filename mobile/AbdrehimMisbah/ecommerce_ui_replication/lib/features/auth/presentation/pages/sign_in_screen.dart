@@ -17,7 +17,10 @@ class SignInScreen extends StatelessWidget {
           Navigator.pushReplacementNamed(
             context,
             '/home',
-            arguments: {'name': state.user.name, 'email': state.user.email},
+            arguments: {
+              'userName': state.user.name,
+              'userEmail': state.user.email,
+            },
           );
         } else if (state is AuthError) {
           showDialog(

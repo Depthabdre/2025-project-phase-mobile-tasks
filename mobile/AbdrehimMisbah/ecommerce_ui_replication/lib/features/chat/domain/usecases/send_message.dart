@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import '../../../../core/error/failure.dart';
 import '../repositories/chat_repository.dart';
 
 class SendMessage {
@@ -5,11 +7,15 @@ class SendMessage {
 
   SendMessage(this.repository);
 
-  Future<void> call({
+  Future<Either<Failure, void>> call({
     required String chatId,
     required String content,
-    required String type, // e.g., "text"
+    required String type,
   }) async {
-    await repository.sendMessage(chatId: chatId, content: content, type: type);
+    return await repository.sendMessage(
+      chatId: chatId,
+      content: content,
+      type: type,
+    );
   }
 }
