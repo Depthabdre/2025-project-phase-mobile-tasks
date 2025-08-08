@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
 import '../entities/chat.dart';
+import '../entities/incoming_socket_message.dart';
 import '../entities/message.dart';
 
 abstract class ChatRepository {
@@ -21,5 +22,5 @@ abstract class ChatRepository {
   });
 
   /// Listen for real-time incoming messages from the socket.
-  Stream<Either<Failure, Message>> get messageStream;
+  Stream<Either<Failure, IncomingSocketMessage>> get messageStream;
 }

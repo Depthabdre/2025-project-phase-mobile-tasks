@@ -3,20 +3,18 @@ import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../../../../core/error/failure.dart';
+import '../../domain/entities/incoming_socket_message.dart';
 import '../../domain/entities/message.dart';
+import '../models/incoming_socket_message_model.dart';
 import '../models/message_model.dart';
 
 abstract class ChatSocketDataSource {
   void connect();
   void disconnect();
 
-  void sendMessage({
-    required String chatId,
-    required String content,
-    required String type,
-  });
+  void sendMessage({required String chatId, required String content});
 
-  Stream<Either<Failure, Message>> get messageStream;
+  Stream<Either<Failure, IncomingSocketMessage>> get messageStream;
 }
 
 class ChatSocketDataSourceImpl implements ChatSocketDataSource {
@@ -24,8 +22,9 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
   final SharedPreferences sharedPreferences;
   late IO.Socket _socket;
 
+  // We keep this open for the lifetime of the data source
   final _messageController =
-      StreamController<Either<Failure, MessageModel>>.broadcast();
+      StreamController<Either<Failure, IncomingSocketMessageModel>>.broadcast();
 
   ChatSocketDataSourceImpl({
     required this.baseUrl,
@@ -35,6 +34,7 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
   @override
   void connect() {
     final authToken = sharedPreferences.getString('CACHED_AUTH_TOKEN') ?? '';
+
     _socket = IO.io(
       baseUrl,
       IO.OptionBuilder()
@@ -45,41 +45,52 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
           .build(),
     );
 
-    _socket.onConnect((_) => print('Socket connected'));
-    _socket.onDisconnect((_) => print('Socket disconnected'));
+    _socket.onConnect((_) => print('✅ Socket connected'));
+    _socket.onDisconnect((_) => print('❌ Socket disconnected'));
+    _socket.onReconnect((_) => print('🔄 Socket reconnected'));
+    _socket.onReconnectAttempt((_) => print('⏳ Attempting to reconnect...'));
 
-    _socket.on('message:received', (data) {
+    // Common message handler
+    void handleMessageEvent(dynamic data) {
       try {
-        final message = MessageModel.fromJson(data);
-        _messageController.add(Right(message)); // Wrap in Right on success
+        final message = IncomingSocketMessageModel.fromJson(data);
+        _messageController.add(Right(message));
       } catch (e) {
-        _messageController.add(Left(ServerFailure())); // Wrap error in Left
+        print('⚠️ Parsing error: $e');
+        print('Raw data: $data');
+        _messageController.add(Left(ServerFailure()));
       }
-    });
+    }
 
-    _socket.on('message:delivered', (data) {
-      print('Message delivered ack received: $data');
-    });
+    // Listen for both events
+    _socket.on('message:received', handleMessageEvent);
+    _socket.on('message:delivered', handleMessageEvent);
   }
 
   @override
   void disconnect() {
-    _socket.dispose();
-    _messageController.close();
+    _socket.disconnect();
+    _socket.close();
+    print('🔌 Socket manually disconnected');
+    // Note: we are NOT closing _messageController here to allow reconnection
   }
 
   @override
-  void sendMessage({
-    required String chatId,
-    required String content,
-    required String type,
-  }) {
-    final payload = {'chatId': chatId, 'content': content, 'type': type};
+  void sendMessage({required String chatId, required String content}) {
+    final msgModel = IncomingSocketMessageModel(
+      chatID: chatId,
+      message: content,
+    );
+    final payload = msgModel.toJson();
+
     _socket.emit('message:send', payload);
+
+    print('📤 Sent message: $payload');
   }
 
   @override
-  Stream<Either<Failure, Message>> get messageStream => _messageController
-      .stream
-      .map((eitherModel) => eitherModel.map((model) => model.toEntity()));
+  Stream<Either<Failure, IncomingSocketMessage>> get messageStream =>
+      _messageController.stream.map(
+        (eitherModel) => eitherModel.map((model) => model.toEntity()),
+      );
 }

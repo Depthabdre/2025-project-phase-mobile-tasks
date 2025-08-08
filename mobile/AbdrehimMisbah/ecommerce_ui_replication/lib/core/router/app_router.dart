@@ -14,6 +14,10 @@ import '../../../features/product/presentation/pages/add_update_product_page.dar
 import '../../../features/product/presentation/pages/product_details_page.dart';
 import '../../../features/product/presentation/pages/retrieve_all_products_page.dart';
 import '../../features/auth/injection_container.dart' as auth_di;
+import '../../features/chat/injection_container.dart' as chat_di;
+import '../../features/chat/presentation/bloc/chat_bloc.dart';
+import '../../features/chat/presentation/pages/chat_detail_page.dart';
+import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/product/injection_container.dart' as product_di;
 
 class AppRouter {
@@ -57,6 +61,27 @@ class AppRouter {
           ),
         );
 
+      // ...Chat Routes
+
+      case '/chatList':
+        final String currentUserId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => chat_di.chatSl<ChatBloc>()..add(LoadChatsEvent()),
+            child: ChatListScreen(currentUserId: currentUserId),
+          ),
+        );
+
+      case '/chatDetail':
+        final Map<String, dynamic> args =
+            settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => ChatDetailScreen.withBloc(
+            chatId: args['chatId'] as String,
+            currentUserId: args['currentUserId'] as String,
+            otherUserName: args['otherUserName'] as String,
+          ),
+        );
       // -------- PRODUCT ROUTES --------
 
       case '/products':

@@ -24,6 +24,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<String> getCachedToken() async {
     final token = sharedPreferences.getString(CACHED_AUTH_TOKEN);
+    print('this is the token $token\n\n yeah the above one ');
     if (token != null) {
       return token;
     } else {

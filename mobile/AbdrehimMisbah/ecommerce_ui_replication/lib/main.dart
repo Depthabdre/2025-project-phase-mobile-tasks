@@ -2,9 +2,8 @@
 import 'package:flutter/material.dart';
 
 import './features/auth/injection_container.dart' as di_auth;
+import './features/chat/injection_container.dart' as chat_di;
 import 'core/router/app_router.dart';
-import 'features/chat/presentation/pages/chat_detail_page.dart';
-import 'features/chat/presentation/pages/chat_list_page.dart';
 import 'features/product/injection_container.dart' as di;
 
 Future<void> main() async {
@@ -12,6 +11,7 @@ Future<void> main() async {
 
   await di.init(); // Initialize product dependencies
   await di_auth.initAuth(); // Initialize auth dependencies
+  await chat_di.initChat(); // Chat feature dependencies
 
   runApp(const MyApp());
 }

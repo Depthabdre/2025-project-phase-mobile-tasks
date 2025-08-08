@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
 import '../../domain/entities/chat.dart';
+import '../../domain/entities/incoming_socket_message.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/repositories/chat_repository.dart';
 import '../datasources/chat_remote_data_source.dart';
@@ -55,7 +56,7 @@ class ChatRepositoryImpl implements ChatRepository {
     required String type,
   }) async {
     try {
-      socketService.sendMessage(chatId: chatId, content: content, type: type);
+      socketService.sendMessage(chatId: chatId, content: content);
       return const Right(null); // success with no data
     } catch (e) {
       return Left(ServerFailure());
@@ -63,6 +64,6 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Stream<Either<Failure, Message>> get messageStream =>
+  Stream<Either<Failure, IncomingSocketMessage>> get messageStream =>
       socketService.messageStream;
 }

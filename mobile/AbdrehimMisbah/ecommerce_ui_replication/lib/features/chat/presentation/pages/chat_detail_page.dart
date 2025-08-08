@@ -1,7 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../injection_container.dart';
+import '../bloc/chat_bloc.dart';
+import '../../domain/entities/message.dart';
 
-class ChatDetailScreen extends StatelessWidget {
-  const ChatDetailScreen({super.key});
+// Import your chat dependency injection instance
+
+class ChatDetailScreen extends StatefulWidget {
+  final String chatId;
+  final String currentUserId;
+  final String otherUserName;
+
+  const ChatDetailScreen({
+    super.key,
+    required this.chatId,
+    required this.currentUserId,
+    required this.otherUserName,
+  });
+
+  @override
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+
+  // Static method to wrap the screen with BlocProvider, so you don't forget to inject ChatBloc
+  static Widget withBloc({
+    required String chatId,
+    required String currentUserId,
+    required String otherUserName,
+  }) {
+    return BlocProvider(
+      create: (_) => chatSl<ChatBloc>(),
+      child: ChatDetailScreen(
+        chatId: chatId,
+        currentUserId: currentUserId,
+        otherUserName: otherUserName,
+      ),
+    );
+  }
+}
+
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
+  final TextEditingController _messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final chatBloc = context.read<ChatBloc>();
+    chatBloc.add(LoadMessagesEvent(chatId: widget.chatId));
+    chatBloc.add(StartListeningMessagesEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,93 +56,48 @@ class ChatDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundImage: AssetImage(
-              'images/profile.png',
-            ), // Replace with your image
+        title: Text(
+          widget.otherUserName,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sabila Sayma',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              '8 members, 5 online',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
-        actions: const [
-          Icon(Icons.call, color: Colors.black),
-          SizedBox(width: 15),
-          Icon(Icons.videocam, color: Colors.black),
-          SizedBox(width: 15),
-          Icon(Icons.more_vert, color: Colors.black),
-          SizedBox(width: 10),
-        ],
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-
       body: Column(
         children: [
+          // Messages list
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // Incoming message (Text)
-                chatBubble(
-                  isMe: false,
-                  text: 'Have a great working week!',
-                  time: '09:25 AM',
-                  avatar: 'images/profile.png',
-                ),
-
-                // Incoming message (Image)
-                chatBubble(
-                  isMe: false,
-                  text: '',
-                  time: '09:25 AM',
-                  avatar: 'assets/profile.png',
-                  image: 'images/profile.png', // Replace with your image
-                ),
-
-                // Outgoing message (You)
-                chatBubble(
-                  isMe: true,
-                  text: 'You did your job well',
-                  time: '09:25 AM',
-                  avatar: 'images/profile.png',
-                ),
-
-                // Incoming message (Audio)
-                chatBubble(
-                  isMe: false,
-                  text: '',
-                  time: '09:26 AM',
-                  avatar: 'images/profile.png',
-                  audioDuration: '00:16',
-                ),
-
-                // Outgoing message (Repeat)
-                chatBubble(
-                  isMe: true,
-                  text: 'You did your job well',
-                  time: '09:26 AM',
-                  avatar: 'images/profile.png',
-                ),
-              ],
+            child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                if (state is ChatLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is MessagesLoaded) {
+                  final messages = state.messages;
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = messages[index];
+                      final isMe = msg.sender.id == widget.currentUserId;
+                      return chatBubble(
+                        isMe: isMe,
+                        text: msg.content,
+                        time: _formatTime(DateTime.now()),
+                        avatar: 'images/profile.png',
+                      );
+                    },
+                  );
+                } else if (state is ChatError) {
+                  return Center(child: Text(state.message));
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ),
 
-          // Bottom Chat Input
+          // Bottom input
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
@@ -109,21 +110,40 @@ class ChatDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
-                SizedBox(width: 10),
+                IconButton(
+                  icon: const Icon(
+                    Icons.emoji_emotions_outlined,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {},
+                ),
                 Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    controller: _messageController,
+                    decoration: const InputDecoration(
                       hintText: 'Write your message',
                       border: InputBorder.none,
                     ),
                   ),
                 ),
-                Icon(Icons.attach_file, color: Colors.grey),
-                SizedBox(width: 10),
-                Icon(Icons.send, color: Colors.blue),
+                IconButton(
+                  icon: const Icon(Icons.send, color: Colors.blue),
+                  onPressed: () {
+                    final text = _messageController.text.trim();
+                    if (text.isNotEmpty) {
+                      context.read<ChatBloc>().add(
+                        SendMessageEvent(
+                          chatId: widget.chatId,
+                          content: text,
+                          type: 'text',
+                        ),
+                      );
+                      _messageController.clear();
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -137,8 +157,6 @@ class ChatDetailScreen extends StatelessWidget {
     required String text,
     required String time,
     required String avatar,
-    String? image,
-    String? audioDuration,
   }) {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -154,9 +172,10 @@ class ChatDetailScreen extends StatelessWidget {
                 : CrossAxisAlignment.start,
             children: [
               Container(
-                padding: image != null || audioDuration != null
-                    ? const EdgeInsets.all(0)
-                    : const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: isMe
                       ? const Color(0xFF4D8EFF)
@@ -168,47 +187,13 @@ class ChatDetailScreen extends StatelessWidget {
                     bottomRight: isMe ? Radius.zero : const Radius.circular(18),
                   ),
                 ),
-                child: image != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          image,
-                          width: 200,
-                          height: 140,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : audioDuration != null
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.play_arrow,
-                            color: isMe ? Colors.white : Colors.black,
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 80,
-                            height: 4,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            audioDuration,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isMe ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Text(
-                        text,
-                        style: TextStyle(
-                          color: isMe ? Colors.white : Colors.black,
-                          fontSize: 14,
-                        ),
-                      ),
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: isMe ? Colors.white : Colors.black,
+                    fontSize: 14,
+                  ),
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -222,5 +207,11 @@ class ChatDetailScreen extends StatelessWidget {
         if (isMe) CircleAvatar(radius: 16, backgroundImage: AssetImage(avatar)),
       ],
     );
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return "$hour:$minute";
   }
 }

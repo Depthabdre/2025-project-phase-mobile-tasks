@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/error/exception.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
+
+const CACHED_AUTH_TOKEN = 'CACHED_AUTH_TOKEN';
 
 abstract class ChatRemoteDataSource {
   /// Calls GET /chats
@@ -17,18 +20,19 @@ abstract class ChatRemoteDataSource {
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   final http.Client client;
   final String baseUrl;
-  final String? authToken;
 
   ChatRemoteDataSourceImpl({
     required this.client,
     this.baseUrl = 'https://g5-flutter-learning-path-be.onrender.com/api/v3',
-    this.authToken,
   });
 
-  Map<String, String> get _headers {
+  Future<Map<String, String>> get _headers async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(CACHED_AUTH_TOKEN);
+
     final headers = {'Content-Type': 'application/json'};
-    if (authToken != null && authToken!.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $authToken';
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
     }
     return headers;
   }
@@ -36,7 +40,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   Future<List<ChatModel>> getAllChats() async {
     final url = Uri.parse('$baseUrl/chats');
-    final response = await client.get(url, headers: _headers);
+    final response = await client.get(url, headers: await _headers);
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -53,7 +57,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   Future<List<MessageModel>> getChatMessages(String chatId) async {
     final url = Uri.parse('$baseUrl/chats/$chatId/messages');
-    final response = await client.get(url, headers: _headers);
+    final response = await client.get(url, headers: await _headers);
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -72,7 +76,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     final url = Uri.parse('$baseUrl/chats');
     final response = await client.post(
       url,
-      headers: _headers,
+      headers: await _headers,
       body: json.encode({'userId': userId}),
     );
 
