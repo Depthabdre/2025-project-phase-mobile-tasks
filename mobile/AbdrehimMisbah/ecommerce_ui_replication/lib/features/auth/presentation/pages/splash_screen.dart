@@ -28,6 +28,7 @@ class _EcomScreenState extends State<EcomScreen> {
             arguments: {
               'userName': state.user.name,
               'userEmail': state.user.email,
+              'userId':state.user.id
             },
           );
         } else if (state is AuthUnauthenticated || state is AuthError) {

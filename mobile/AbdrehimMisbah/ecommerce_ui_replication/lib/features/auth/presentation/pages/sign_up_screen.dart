@@ -49,6 +49,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             arguments: {
               'userName': state.user.name,
               'userEmail': state.user.email,
+              'userId': state.user.id,
             },
           );
         } else if (state is AuthError) {

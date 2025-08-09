@@ -20,6 +20,7 @@ class SignInScreen extends StatelessWidget {
             arguments: {
               'userName': state.user.name,
               'userEmail': state.user.email,
+              'userId': state.user.id,
             },
           );
         } else if (state is AuthError) {

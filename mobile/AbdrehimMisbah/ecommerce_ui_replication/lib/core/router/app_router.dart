@@ -57,6 +57,7 @@ class AppRouter {
             child: HomeScreen(
               userName: args['userName']!,
               userEmail: args['userEmail']!,
+              userId: args['userId']!,
             ),
           ),
         );

@@ -5,11 +5,13 @@ import '../bloc/auth_bloc.dart';
 class HomeScreen extends StatelessWidget {
   final String userName;
   final String userEmail;
+  final String userId;
 
   const HomeScreen({
     super.key,
     required this.userName,
     required this.userEmail,
+    required this.userId,
   });
 
   @override
@@ -120,6 +122,35 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     'Log Out',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      letterSpacing: 0.02,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              // Navigate to Chat List Button
+              SizedBox(
+                width: double.infinity,
+                height: 42,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final currentUserId = userId;
+                    Navigator.of(
+                      context,
+                    ).pushNamed('/chatList', arguments: currentUserId);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: blueColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Go to Chat Screen',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
