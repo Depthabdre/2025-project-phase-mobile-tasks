@@ -51,12 +51,10 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<Either<Failure, void>> sendMessage({
-    required String chatId,
-    required String content,
-    required String type,
+    required IncomingSocketMessage outgoingMessage,
   }) async {
     try {
-      socketService.sendMessage(chatId: chatId, content: content);
+      socketService.sendMessage(outgoingMessage: outgoingMessage);
       return const Right(null); // success with no data
     } catch (e) {
       return Left(ServerFailure());
@@ -64,6 +62,10 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Stream<Either<Failure, IncomingSocketMessage>> get messageStream =>
-      socketService.messageStream;
+  Stream<Either<Failure, IncomingSocketMessage>> get messageReceivedStream =>
+      socketService.messageReceivedStream;
+
+  @override
+  Stream<Either<Failure, IncomingSocketMessage>> get messageDeliveredStream =>
+      socketService.messageDeliveredStream;
 }

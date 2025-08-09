@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/datasources/chat_remote_data_source.dart';
@@ -9,6 +8,7 @@ import 'domain/repositories/chat_repository.dart';
 import 'domain/usecases/get_all_chat.dart';
 import 'domain/usecases/get_chat_message.dart';
 import 'domain/usecases/initiate_chat.dart';
+import 'domain/usecases/listen_for_delivered_messages.dart';
 import 'domain/usecases/listen_incoming_message.dart';
 import 'domain/usecases/send_message.dart';
 import 'presentation/bloc/chat_bloc.dart';
@@ -26,6 +26,7 @@ Future<void> initChat() async {
       initiateChat: chatSl(),
       sendMessage: chatSl(),
       listenForIncomingMessages: chatSl(),
+      listenForDeliveredMessages: chatSl(),
     ),
   );
 
@@ -35,6 +36,7 @@ Future<void> initChat() async {
   chatSl.registerLazySingleton(() => InitiateChatUseCase(chatSl()));
   chatSl.registerLazySingleton(() => SendMessage(chatSl()));
   chatSl.registerLazySingleton(() => ListenForIncomingMessages(chatSl()));
+  chatSl.registerLazySingleton(() => ListenForDeliveredMessages(chatSl()));
 
   // Repository
   chatSl.registerLazySingleton<ChatRepository>(

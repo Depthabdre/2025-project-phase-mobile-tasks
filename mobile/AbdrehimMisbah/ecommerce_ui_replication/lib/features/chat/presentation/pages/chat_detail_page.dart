@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../injection_container.dart';
 import '../bloc/chat_bloc.dart';
-import '../../domain/entities/message.dart';
-
-// Import your chat dependency injection instance
 
 class ChatDetailScreen extends StatefulWidget {
   final String chatId;
@@ -18,10 +15,6 @@ class ChatDetailScreen extends StatefulWidget {
     required this.otherUserName,
   });
 
-  @override
-  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
-
-  // Static method to wrap the screen with BlocProvider, so you don't forget to inject ChatBloc
   static Widget withBloc({
     required String chatId,
     required String currentUserId,
@@ -36,6 +29,9 @@ class ChatDetailScreen extends StatefulWidget {
       ),
     );
   }
+
+  @override
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
@@ -73,19 +69,27 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               builder: (context, state) {
                 if (state is ChatLoading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (state is MessagesLoaded) {
+                }
+                if (state is MessagesLoaded) {
+                  final deliveredKeys = context
+                      .read<ChatBloc>()
+                      .deliveredMessageKeys;
                   final messages = state.messages;
+
                   return ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
                       final isMe = msg.sender.id == widget.currentUserId;
+                      final key = '${msg.chatId}_${msg.content}';
+
                       return chatBubble(
                         isMe: isMe,
                         text: msg.content,
                         time: _formatTime(DateTime.now()),
                         avatar: 'images/profile.png',
+                        delivered: deliveredKeys.contains(key),
                       );
                     },
                   );
@@ -157,6 +161,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     required String text,
     required String time,
     required String avatar,
+    bool delivered = false,
   }) {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -196,9 +201,24 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                time,
-                style: const TextStyle(fontSize: 10, color: Colors.grey),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    time,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  if (isMe) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      delivered
+                          ? Icons.check_circle
+                          : Icons.check_circle_outline,
+                      size: 14,
+                      color: delivered ? Colors.blue : Colors.grey,
+                    ),
+                  ],
+                ],
               ),
             ],
           ),

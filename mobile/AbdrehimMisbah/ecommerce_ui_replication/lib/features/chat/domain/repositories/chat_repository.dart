@@ -16,11 +16,12 @@ abstract class ChatRepository {
 
   /// Send a new message via socket.
   Future<Either<Failure, void>> sendMessage({
-    required String chatId,
-    required String content,
-    required String type,
+    required IncomingSocketMessage outgoingMessage,
   });
 
-  /// Listen for real-time incoming messages from the socket.
-  Stream<Either<Failure, IncomingSocketMessage>> get messageStream;
+  /// Listen for new incoming messages
+  Stream<Either<Failure, IncomingSocketMessage>> get messageReceivedStream;
+
+  /// Listen for delivery confirmation of sent messages
+  Stream<Either<Failure, IncomingSocketMessage>> get messageDeliveredStream;
 }

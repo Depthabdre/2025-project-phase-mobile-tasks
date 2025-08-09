@@ -12,6 +12,7 @@ import '../../domain/usecases/get_chat_message.dart';
 
 import '../../domain/usecases/initiate_chat.dart';
 
+import '../../domain/usecases/listen_for_delivered_messages.dart';
 import '../../domain/usecases/listen_incoming_message.dart';
 import '../../domain/usecases/send_message.dart';
 
@@ -24,6 +25,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final InitiateChatUseCase initiateChat;
   final SendMessage sendMessage;
   final ListenForIncomingMessages listenForIncomingMessages;
+  final ListenForDeliveredMessages listenForDeliveredMessages;
+  final Set<String> _deliveredMessageKeys = {};
+  bool _initialMessagesLoaded = false;
 
   StreamSubscription? _messageSubscription;
   List<Message> _currentMessages = [];
@@ -34,6 +38,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.initiateChat,
     required this.sendMessage,
     required this.listenForIncomingMessages,
+    required this.listenForDeliveredMessages,
   }) : super(ChatInitial()) {
     on<LoadChatsEvent>(_onLoadChats);
     on<LoadMessagesEvent>(_onLoadMessages);
@@ -41,6 +46,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<StartListeningMessagesEvent>(_onStartListening);
     on<IncomingMessageEvent>(_onIncomingMessage);
     on<InitiateChatEvent>(_onInitiateChat);
+    on<MessageDeliveredEvent>(_onMessageDelivered);
   }
 
   Future<void> _onLoadChats(
@@ -65,6 +71,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
       (messages) {
         _currentMessages = messages;
+        // Mark all API-loaded messages as delivered
+        for (var msg in messages) {
+          _deliveredMessageKeys.add('${msg.chatId}_${msg.content}');
+        }
+
+        _initialMessagesLoaded = true;
         emit(MessagesLoaded(messages: messages));
       },
     );
@@ -74,11 +86,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     SendMessageEvent event,
     Emitter<ChatState> emit,
   ) async {
-    final result = await sendMessage(
-      chatId: event.chatId,
-      content: event.content,
-      type: event.type,
+    IncomingSocketMessage outgoingMessage = IncomingSocketMessage(
+      chatID: event.chatId,
+      message: event.content,
     );
+    final result = await sendMessage(outgoingMessage: outgoingMessage);
     result.fold(
       (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
       (_) {
@@ -92,12 +104,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) {
     _messageSubscription?.cancel();
-    _messageSubscription = listenForIncomingMessages().listen((
-      eitherFailureOrMessage,
-    ) {
-      eitherFailureOrMessage.fold(
+
+    // Listen for new messages
+    _messageSubscription = listenForIncomingMessages().listen((either) {
+      either.fold(
         (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
-        (message) => add(IncomingMessageEvent(message: message)),
+        (incoming) => add(IncomingMessageEvent(message: incoming)),
+      );
+    });
+
+    // Listen for delivery confirmations
+    listenForDeliveredMessages().listen((either) {
+      either.fold(
+        (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
+        (incoming) => add(MessageDeliveredEvent(message: incoming)),
       );
     });
   }
@@ -119,6 +139,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(MessagesLoaded(messages: List.from(_currentMessages)));
   }
 
+  void _onMessageDelivered(
+    MessageDeliveredEvent event,
+    Emitter<ChatState> emit,
+  ) {
+    if (_initialMessagesLoaded) {
+      final key = '${event.message.chatID}_${event.message.message}';
+
+      // Mark as delivered
+      _deliveredMessageKeys.add(key);
+
+      // Re-emit to update UI
+      emit(MessagesLoaded(messages: List.from(_currentMessages)));
+    }
+  }
+
   Future<void> _onInitiateChat(
     InitiateChatEvent event,
     Emitter<ChatState> emit,
@@ -136,6 +171,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _messageSubscription?.cancel();
     return super.close();
   }
+
+  Set<String> get deliveredMessageKeys => _deliveredMessageKeys;
 }
 
 String _mapFailureToMessage(Failure failure) {

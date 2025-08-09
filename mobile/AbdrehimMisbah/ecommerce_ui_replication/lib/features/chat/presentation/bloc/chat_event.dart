@@ -2,7 +2,6 @@ part of 'chat_bloc.dart';
 
 sealed class ChatEvent extends Equatable {
   const ChatEvent();
-
   @override
   List<Object?> get props => [];
 }
@@ -30,6 +29,11 @@ class StartListeningMessagesEvent extends ChatEvent {}
 class IncomingMessageEvent extends ChatEvent {
   final IncomingSocketMessage message;
   const IncomingMessageEvent({required this.message});
+}
+
+class MessageDeliveredEvent extends ChatEvent {
+  final IncomingSocketMessage message;
+  const MessageDeliveredEvent({required this.message});
 }
 
 class InitiateChatEvent extends ChatEvent {

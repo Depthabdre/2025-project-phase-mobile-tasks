@@ -26,7 +26,7 @@ abstract class AuthRemoteDataSource {
 
 // 🔗 Base URL
 const String _baseUrl =
-    'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v2';
+    'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v3';
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
