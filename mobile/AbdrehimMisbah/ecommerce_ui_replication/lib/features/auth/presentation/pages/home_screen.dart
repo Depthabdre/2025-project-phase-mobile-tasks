@@ -106,60 +106,96 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // Log Out Button
-              SizedBox(
-                width: double.infinity,
-                height: 42,
-                child: ElevatedButton(
-                  onPressed: () {
-                    BlocProvider.of<AuthBloc>(context).add(LogoutEvent());
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: blueColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              // Inside your Column where the buttons are:
+              const SizedBox(height: 30),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Chat Card
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(
+                          context,
+                        ).pushNamed('/chatList', arguments: userId);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: blueColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 6,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Column(
+                          children: [
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Chats',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'Log Out',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      letterSpacing: 0.02,
-                      color: Colors.white,
+                  const SizedBox(width: 16),
+                  // Products Card
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed('/products');
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 6,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Column(
+                          children: [
+                            Icon(
+                              Icons.shopping_bag_outlined,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Products",
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              // Navigate to Chat List Button
-              SizedBox(
-                width: double.infinity,
-                height: 42,
-                child: ElevatedButton(
-                  onPressed: () {
-                    final currentUserId = userId;
-                    Navigator.of(
-                      context,
-                    ).pushNamed('/chatList', arguments: currentUserId);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: blueColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    'Go to Chat Screen',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      letterSpacing: 0.02,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                ],
               ),
             ],
           ),

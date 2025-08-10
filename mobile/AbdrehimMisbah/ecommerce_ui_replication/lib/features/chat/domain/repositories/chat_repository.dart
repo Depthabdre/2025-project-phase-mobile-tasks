@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
+import '../../../auth/domain/entities/user.dart';
 import '../entities/chat.dart';
 import '../entities/incoming_socket_message.dart';
 import '../entities/message.dart';
@@ -24,4 +25,6 @@ abstract class ChatRepository {
 
   /// Listen for delivery confirmation of sent messages
   Stream<Either<Failure, IncomingSocketMessage>> get messageDeliveredStream;
+
+  Future<Either<Failure, List<User>>> getAllUsers();
 }

@@ -26,7 +26,7 @@ class ProductRepositoryImpl implements ProductRepository {
       try {
         final remoteProducts = await remoteDataSource.getAllProducts();
         localDataSource.cacheProductList(remoteProducts);
-        return Right(remoteProducts);
+        return Right(remoteProducts.map((p) => p.toEntity()).toList());
       } on ServerException {
         return Left(ServerFailure());
       }
@@ -46,7 +46,7 @@ class ProductRepositoryImpl implements ProductRepository {
       try {
         final remoteProduct = await remoteDataSource.getProductById(id);
         await localDataSource.cacheProduct(remoteProduct);
-        return Right(remoteProduct);
+        return Right(remoteProduct.toEntity());
       } on ServerException {
         return Left(ServerFailure());
       }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/error/exception.dart';
 import '../models/product_model.dart';
@@ -16,19 +17,29 @@ abstract class ProductRemoteDataSource {
 
 // ✅ Constants for endpoints
 const String _baseUrl =
-    'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v1/products';
+    'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v3/products';
+const String CACHED_AUTH_TOKEN = 'CACHED_AUTH_TOKEN';
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final http.Client client;
 
   ProductRemoteDataSourceImpl({required this.client});
 
+  // ✅ Get dynamic headers with token
+  Future<Map<String, String>> get _headers async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(CACHED_AUTH_TOKEN);
+
+    final headers = {'Content-Type': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return headers;
+  }
+
   // ✅ Unified GET handler
   Future<http.Response> _getRequest(Uri url) async {
-    final response = await client.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
+    final response = await client.get(url, headers: await _headers);
     if (response.statusCode == 200) {
       return response;
     } else {
@@ -40,7 +51,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   Future<void> _putRequest(Uri url, Map<String, dynamic> body) async {
     final response = await client.put(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: await _headers,
       body: json.encode(body),
     );
 
@@ -51,10 +62,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   // ✅ Unified DELETE handler
   Future<void> _deleteRequest(Uri url) async {
-    final response = await client.delete(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
+    final response = await client.delete(url, headers: await _headers);
 
     if (response.statusCode != 200) {
       throw ServerException();
@@ -64,11 +72,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   // ✅ Multipart request for file upload
   Future<void> _postMultipartProduct(ProductModel product) async {
     final uri = Uri.parse(_baseUrl);
+    final headers = await _headers;
 
     final request = http.MultipartRequest('POST', uri)
       ..fields['name'] = product.name
       ..fields['description'] = product.description
-      ..fields['price'] = product.price.toString();
+      ..fields['price'] = product.price.toString()
+      ..headers.addAll(headers);
 
     final imageFile = File(product.imageUrl);
     if (!await imageFile.exists()) {

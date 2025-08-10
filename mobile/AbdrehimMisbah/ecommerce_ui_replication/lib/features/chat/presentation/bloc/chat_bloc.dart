@@ -87,8 +87,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     IncomingSocketMessage outgoingMessage = IncomingSocketMessage(
-      chatID: event.chatId,
+      chatId: event.chatId,
       message: event.content,
+      type: 'text',
     );
     final result = await sendMessage(outgoingMessage: outgoingMessage);
     result.fold(
@@ -130,7 +131,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         name: 'Unknown',
         email: 'temp@gmail.com',
       ), // you can map this properly
-      chatId: event.message.chatID,
+      chatId: event.message.chatId,
       content: event.message.message,
       type: 'text',
     );
@@ -144,7 +145,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) {
     if (_initialMessagesLoaded) {
-      final key = '${event.message.chatID}_${event.message.message}';
+      final key = '${event.message.chatId}_${event.message.message}';
 
       // Mark as delivered
       _deliveredMessageKeys.add(key);

@@ -113,8 +113,9 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
     }
 
     final msgModel = IncomingSocketMessageModel(
-      chatID: outgoingMessage.chatID,
+      chatId: outgoingMessage.chatId,
       message: outgoingMessage.message,
+      type: outgoingMessage.type,
     );
 
     final payload = msgModel.toJson();

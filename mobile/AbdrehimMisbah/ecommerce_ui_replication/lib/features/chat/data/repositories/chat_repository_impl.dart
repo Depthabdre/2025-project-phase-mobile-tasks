@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
+import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/chat.dart';
 import '../../domain/entities/incoming_socket_message.dart';
 import '../../domain/entities/message.dart';
@@ -56,6 +57,16 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       socketService.sendMessage(outgoingMessage: outgoingMessage);
       return const Right(null); // success with no data
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<User>>> getAllUsers() async {
+    try {
+      final models = await remoteDataSource.getAllUsers();
+      return Right(models.map((m) => m.toEntity()).toList());
     } catch (e) {
       return Left(ServerFailure());
     }

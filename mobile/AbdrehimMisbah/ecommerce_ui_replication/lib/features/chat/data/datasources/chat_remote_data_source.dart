@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/error/exception.dart';
+import '../../../auth/data/models/user_model.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 
@@ -15,6 +16,7 @@ abstract class ChatRemoteDataSource {
   Future<List<MessageModel>> getChatMessages(String chatId);
 
   Future<ChatModel> initiateChat(String userId);
+  Future<List<UserModel>> getAllUsers();
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -23,7 +25,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   ChatRemoteDataSourceImpl({
     required this.client,
-    this.baseUrl = 'https://g5-flutter-learning-path-be.onrender.com/api/v3',
+    this.baseUrl =
+        'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v3',
   });
 
   Future<Map<String, String>> get _headers async {
@@ -84,6 +87,24 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       final body = json.decode(response.body);
       final chatJson = body['data'];
       return ChatModel.fromJson(chatJson);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<List<UserModel>> getAllUsers() async {
+    final response = await client.get(
+      Uri.parse(
+        'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v3/users',
+      ),
+      headers: await _headers,
+    );
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      final List<dynamic> data = body['data'];
+      return data.map((json) => UserModel.fromJson(json)).toList();
     } else {
       throw ServerException();
     }

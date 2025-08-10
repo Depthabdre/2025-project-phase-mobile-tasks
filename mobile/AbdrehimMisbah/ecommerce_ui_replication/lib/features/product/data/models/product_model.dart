@@ -12,7 +12,7 @@ class ProductModel extends Product {
   @override
   List<Object> get props => [id];
 
-  // ✅ Add this method to convert from domain entity → model
+  // ✅ Convert from domain entity → model
   factory ProductModel.fromEntity(Product product) {
     return ProductModel(
       id: product.id,
@@ -23,18 +23,18 @@ class ProductModel extends Product {
     );
   }
 
-  // 🧠 Important: fromJson converts Map → ProductModel
+  // 🧠 Convert from JSON → model
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'],
       name: json['name'],
       imageUrl: json['imageUrl'],
-      price: (json['price'] as num).toDouble(), // handles 1 or 1.0
+      price: (json['price'] as num).toDouble(),
       description: json['description'],
     );
   }
 
-  /// 🔄 Converts Dart object → Map<String, dynamic>
+  // 🔄 Convert model → JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -43,5 +43,16 @@ class ProductModel extends Product {
       'price': price,
       'description': description,
     };
+  }
+
+  // 🔄 Convert model → entity
+  Product toEntity() {
+    return Product(
+      id: id,
+      name: name,
+      imageUrl: imageUrl,
+      price: price,
+      description: description,
+    );
   }
 }

@@ -16,6 +16,7 @@ import '../../../features/product/presentation/pages/retrieve_all_products_page.
 import '../../features/auth/injection_container.dart' as auth_di;
 import '../../features/chat/injection_container.dart' as chat_di;
 import '../../features/chat/presentation/bloc/chat_bloc.dart';
+import '../../features/chat/presentation/bloc/user/user_bloc.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/product/injection_container.dart' as product_di;
@@ -67,8 +68,17 @@ class AppRouter {
       case '/chatList':
         final String currentUserId = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => chat_di.chatSl<ChatBloc>()..add(LoadChatsEvent()),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    chat_di.chatSl<ChatBloc>()..add(LoadChatsEvent()),
+              ),
+              BlocProvider(
+                create: (_) =>
+                    chat_di.chatSl<UserBloc>()..add(LoadUsersEvent()),
+              ),
+            ],
             child: ChatListScreen(currentUserId: currentUserId),
           ),
         );

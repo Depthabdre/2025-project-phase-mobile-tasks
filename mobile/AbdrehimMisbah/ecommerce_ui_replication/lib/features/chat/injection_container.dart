@@ -6,12 +6,14 @@ import 'data/datasources/chat_socket_data_source.dart';
 import 'data/repositories/chat_repository_impl.dart';
 import 'domain/repositories/chat_repository.dart';
 import 'domain/usecases/get_all_chat.dart';
+import 'domain/usecases/get_all_user.dart';
 import 'domain/usecases/get_chat_message.dart';
 import 'domain/usecases/initiate_chat.dart';
 import 'domain/usecases/listen_for_delivered_messages.dart';
 import 'domain/usecases/listen_incoming_message.dart';
 import 'domain/usecases/send_message.dart';
 import 'presentation/bloc/chat_bloc.dart';
+import 'presentation/bloc/user/user_bloc.dart';
 
 final chatSl = GetIt.instance;
 
@@ -29,6 +31,8 @@ Future<void> initChat() async {
       listenForDeliveredMessages: chatSl(),
     ),
   );
+  // Register UserBloc
+  chatSl.registerFactory<UserBloc>(() => UserBloc(getUsers: chatSl()));
 
   // Use cases
   chatSl.registerLazySingleton(() => GetAllChats(chatSl()));
@@ -37,6 +41,7 @@ Future<void> initChat() async {
   chatSl.registerLazySingleton(() => SendMessage(chatSl()));
   chatSl.registerLazySingleton(() => ListenForIncomingMessages(chatSl()));
   chatSl.registerLazySingleton(() => ListenForDeliveredMessages(chatSl()));
+  chatSl.registerLazySingleton(() => GetUsers(chatSl()));
 
   // Repository
   chatSl.registerLazySingleton<ChatRepository>(
