@@ -24,7 +24,9 @@ class ChatDetailScreen extends StatefulWidget {
     required String otherUserName,
   }) {
     return BlocProvider(
-      create: (_) => chatSl<ChatBloc>(),
+      create: (_) => chatSl<ChatBloc>()
+        ..add(LoadMessagesEvent(chatId: chatId))
+        ..add(StartListeningMessagesEvent()),
       child: ChatDetailScreen(
         chatId: chatId,
         currentUserId: currentUserId,
@@ -40,13 +42,14 @@ class ChatDetailScreen extends StatefulWidget {
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  @override
-  void initState() {
-    super.initState();
-    final chatBloc = context.read<ChatBloc>();
-    chatBloc.add(LoadMessagesEvent(chatId: widget.chatId));
-    chatBloc.add(StartListeningMessagesEvent());
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
 
   @override
@@ -57,7 +60,6 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          // maks sure to change into name later after debgginh
           widget.otherUserName,
           style: const TextStyle(
             color: Colors.black,
@@ -68,11 +70,19 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       ),
       body: Column(
         children: [
-          // Messages list
           Expanded(
-            child: BlocBuilder<ChatBloc, ChatState>(
+            child: BlocConsumer<ChatBloc, ChatState>(
+              listener: (context, state) {
+                if (state is MessagesLoaded) {
+                  _scrollToBottom();
+                } else if (state is ChatError) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.message)));
+                }
+              },
               builder: (context, state) {
-                if (state is ChatLoading) {
+                if (state is MessagesLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (state is MessagesLoaded) {
@@ -80,26 +90,23 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   final messages = state.messages;
 
                   return ListView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.all(16),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
                       final isMe = msg.sender.id == widget.currentUserId;
-                      final key = '${msg.chatId}_${msg.content}';
-                      final content = msg.content;
-                      print("messag is $content");
+                      final key = msg.id ?? '${msg.chatId}_${msg.content}';
 
-                      return chatBubble(
+                      return ChatBubble(
                         isMe: isMe,
                         text: msg.content,
-                        time: _formatTime(DateTime.now()),
+                        time: _formatTime(msg.createdAt ?? DateTime.now()),
                         avatar: 'images/profile.png',
                         delivered: deliveredKeys.contains(key),
                       );
                     },
                   );
-                } else if (state is ChatError) {
-                  return Center(child: Text(state.message));
                 }
                 return const SizedBox.shrink();
               },
@@ -107,68 +114,87 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           ),
 
           // Bottom input
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 4,
-                  color: Colors.black.withOpacity(0.05),
-                  offset: const Offset(0, -1),
-                ),
-              ],
+          _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 4,
+            color: Colors.black.withOpacity(0.05),
+            offset: const Offset(0, -1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+            onPressed: () {},
+          ),
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              decoration: const InputDecoration(
+                hintText: 'Write your message',
+                border: InputBorder.none,
+              ),
             ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.emoji_emotions_outlined,
-                    color: Colors.grey,
+          ),
+          IconButton(
+            icon: const Icon(Icons.send, color: Colors.blue),
+            onPressed: () {
+              final text = _messageController.text.trim();
+              if (text.isNotEmpty) {
+                context.read<ChatBloc>().add(
+                  SendMessageEvent(
+                    chatId: widget.chatId,
+                    content: text,
+                    type: 'text',
                   ),
-                  onPressed: () {},
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: const InputDecoration(
-                      hintText: 'Write your message',
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue),
-                  onPressed: () {
-                    final text = _messageController.text.trim();
-                    print("the send message is $text");
-                    if (text.isNotEmpty) {
-                      context.read<ChatBloc>().add(
-                        SendMessageEvent(
-                          chatId: widget.chatId,
-                          content: text,
-                          type: 'text',
-                        ),
-                      );
-                      _messageController.clear();
-                    }
-                  },
-                ),
-              ],
-            ),
+                );
+                _messageController.clear();
+                FocusScope.of(context).unfocus();
+              }
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget chatBubble({
-    required bool isMe,
-    required String text,
-    required String time,
-    required String avatar,
-    bool delivered = false,
-  }) {
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return "$hour:$minute";
+  }
+}
+
+class ChatBubble extends StatelessWidget {
+  final bool isMe;
+  final String text;
+  final String time;
+  final String avatar;
+  final bool delivered;
+
+  const ChatBubble({
+    super.key,
+    required this.isMe,
+    required this.text,
+    required this.time,
+    required this.avatar,
+    this.delivered = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -233,11 +259,5 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         if (isMe) CircleAvatar(radius: 16, backgroundImage: AssetImage(avatar)),
       ],
     );
-  }
-
-  String _formatTime(DateTime dateTime) {
-    final hour = dateTime.hour.toString().padLeft(2, '0');
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    return "$hour:$minute";
   }
 }

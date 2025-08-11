@@ -10,6 +10,8 @@ class ChatInitial extends ChatState {}
 
 class ChatLoading extends ChatState {}
 
+class MessagesLoading extends ChatState {}
+
 class ChatsLoaded extends ChatState {
   final List<Chat> chats;
   const ChatsLoaded({required this.chats});
