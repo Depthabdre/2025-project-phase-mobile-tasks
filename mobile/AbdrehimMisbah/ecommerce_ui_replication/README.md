@@ -1,17 +1,44 @@
-# 🏍️ Flutter E-Commerce UI App (Clean Architecture)
+🏍️ Flutter E‑Commerce UI App (Clean Architecture)
+A modern, cleanly structured E‑Commerce Product Management app built with Flutter using Clean Architecture principles. This project now includes: Product, Auth, and Chat features — each implemented with domain/use‑case/repository separation and BLoC for presentation.
 
-A modern, cleanly structured E-Commerce Product Management app built with Flutter using Clean Architecture principles. This app enables users to view, add, update, and delete products with a sleek, intuitive UI and smooth animations.
+✨ Features
+Product
 
----
+📦 View a list of products
 
-## ✨ Features
+➕ Create a product (name, price, description, imageUrl)
 
-* 📦 View a list of available products
-* ➕ Add new products with name, category, price, and description
-* ✏️ Update existing products
-* 🗑️ Delete products
-* 🔍 View detailed product information including size selection
-* 💫 Smooth page transitions (fade, slide, scale animations)
+✏️ Update a product
+
+🗑️ Delete a product
+
+🔍 Product detail view (size/variant selection if needed)
+
+♻️ Full offline/local support via local data source (optional)
+
+Auth
+
+🔑 Sign up / Register
+
+🔐 Sign in / Login
+
+🔄 Persistent session (SharedPreferences / secure storage)
+
+🔒 Automatic nav to home on success
+
+🔁 Reuse AuthBloc for both login and signup flows
+
+Chat
+
+💬 Real‑time messaging using Socket.IO
+
+📥 Load chats & messages
+
+📨 Send/receive messages live
+
+✅ Delivery/read tracking support (message statuses)
+
+🧩 Message model with sender metadata and timestamps
 
 ---
 
@@ -21,13 +48,26 @@ This project follows the **Clean Architecture** pattern, promoting separation of
 
 ```
 lib/
-🔽️ core/                       # Core utilities (common widgets, styles, constants, error handling)
-🔽️ features/
-│   └🔾 product/
-│       ├🔾 data/               # Data layer (models, datasources, repositories implementation)
-│       ├🔾 domain/             # Domain layer (entities, repository abstract classes, use cases)
-│       └🔾 presentation/       # Presentation layer (UI screens, widgets, blocs/cubits/providers)
-🔽️ main.dart                   # App entry point and routing
+├─ core/                       # Common widgets, errors, constants
+├─ features/
+│  ├─ auth/
+│  │  ├─ data/
+│  │  ├─ domain/
+│  │  ├─ presentation/
+│  │  └─ injection_container.dart   # Registers AuthBloc, use cases, AuthRepository, etc.
+│  ├─ product/
+│  │  ├─ data/
+│  │  ├─ domain/
+│  │  ├─ presentation/
+│  │  └─ injection_container.dart   # Registers ProductBloc, use cases, ProductRepository, etc.
+│  └─ chat/
+│     ├─ data/
+│     ├─ domain/
+│     ├─ presentation/
+│     └─ injection_container.dart   # Registers ChatBloc, UserBloc, use cases, ChatRepository, socket DS, etc.
+└─ main.dart
+
+
 ```
 
 ### 📂 Test Structure
@@ -49,7 +89,6 @@ test/
 
 ![Clean Architecture Diagram](screenshots/Clean-Architecture-Flutter-Diagram.webp)
 
-
 Each layer only depends on the layer directly below it. This ensures high decoupling and testability.
 
 ---
@@ -66,9 +105,9 @@ Each layer only depends on the layer directly below it. This ensures high decoup
 
 ### ✅ Prerequisites
 
-* Flutter SDK: [Install Flutter](https://flutter.dev/docs/get-started/install)
-* IDE: VS Code / Android Studio
-* Android/iOS emulator or real device
+- Flutter SDK: [Install Flutter](https://flutter.dev/docs/get-started/install)
+- IDE: VS Code / Android Studio
+- Android/iOS emulator or real device
 
 ---
 
@@ -106,10 +145,10 @@ Test files are organized using the same structure as the `lib/` directory to ens
 
 ## 🧩 Technologies Used
 
-* 🧱 Flutter 
-* 🗺 Clean Architecture
-* 💡 Provider 
-* 🧪 flutter\_test & mockito (for testing)
+- 🧱 Flutter
+- 🗺 Clean Architecture
+- 💡 Provider
+- 🧪 flutter_test & mockito (for testing)
 
 ---
 
