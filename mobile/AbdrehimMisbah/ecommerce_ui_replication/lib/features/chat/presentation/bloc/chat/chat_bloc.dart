@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../../core/error/failure.dart';
-import '../../../auth/domain/entities/user.dart';
-import '../../domain/entities/chat.dart';
-import '../../domain/entities/incoming_socket_message.dart';
-import '../../domain/entities/message.dart';
-import '../../domain/usecases/get_all_chat.dart';
+import '../../../../../core/error/failure.dart';
+import '../../../../auth/domain/entities/user.dart';
+import '../../../domain/entities/chat.dart';
+import '../../../domain/entities/incoming_socket_message.dart';
+import '../../../domain/entities/message.dart';
+import '../../../domain/usecases/get_all_chat.dart';
 
-import '../../domain/usecases/get_chat_message.dart';
+import '../../../domain/usecases/get_chat_message.dart';
 
-import '../../domain/usecases/initiate_chat.dart';
+import '../../../domain/usecases/initiate_chat.dart';
 
-import '../../domain/usecases/listen_for_delivered_messages.dart';
-import '../../domain/usecases/listen_incoming_message.dart';
-import '../../domain/usecases/send_message.dart';
+import '../../../domain/usecases/listen_for_delivered_messages.dart';
+import '../../../domain/usecases/listen_incoming_message.dart';
+import '../../../domain/usecases/send_message.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/chat.dart';
 import '../../injection_container.dart';
-import '../bloc/chat_bloc.dart';
+import '../bloc/chat/chat_bloc.dart';
 import '../bloc/user/user_bloc.dart';
 import 'chat_detail_page.dart';
 

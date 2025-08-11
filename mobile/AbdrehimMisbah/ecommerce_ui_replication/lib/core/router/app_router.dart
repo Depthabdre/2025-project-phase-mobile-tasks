@@ -15,7 +15,7 @@ import '../../../features/product/presentation/pages/product_details_page.dart';
 import '../../../features/product/presentation/pages/retrieve_all_products_page.dart';
 import '../../features/auth/injection_container.dart' as auth_di;
 import '../../features/chat/injection_container.dart' as chat_di;
-import '../../features/chat/presentation/bloc/chat_bloc.dart';
+import '../../features/chat/presentation/bloc/chat/chat_bloc.dart';
 import '../../features/chat/presentation/bloc/user/user_bloc.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';

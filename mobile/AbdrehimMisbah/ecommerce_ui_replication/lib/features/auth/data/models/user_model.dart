@@ -17,13 +17,13 @@ class UserModel extends User {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'], // matches backend response key
+      id: json['_id'], // matches backend response key
       name: json['name'],
       email: json['email'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name, 'email': email};
+    return {'_id': id, 'name': name, 'email': email};
   }
 }

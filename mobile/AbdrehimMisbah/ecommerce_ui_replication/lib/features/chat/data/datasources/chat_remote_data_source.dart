@@ -104,8 +104,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
       final List<dynamic> data = body['data'];
+      print("Here is the date $data");
       return data.map((json) => UserModel.fromJson(json)).toList();
     } else {
+      print("Here is the date ERROR");
       throw ServerException();
     }
   }

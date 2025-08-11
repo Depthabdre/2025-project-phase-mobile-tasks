@@ -92,8 +92,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     if (response.statusCode == 200) {
-      final decoded = json.decode(response.body);
-      return UserModel.fromJson(decoded['data']);
+      final decodedUser = json.decode(response.body);
+      print("decoded user is $decodedUser['data]");
+      // Extract data and rename 'id' to '_id'
+      final userData = Map<String, dynamic>.from(decodedUser['data']);
+      if (userData.containsKey('id')) {
+        userData['_id'] = userData.remove('id');
+      }
+      // Now you can safely pass it to your model
+      final user = UserModel.fromJson(userData);
+      return user;
     } else {
       throw ServerException();
     }

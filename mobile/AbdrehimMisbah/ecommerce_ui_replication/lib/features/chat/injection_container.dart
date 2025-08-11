@@ -12,7 +12,7 @@ import 'domain/usecases/initiate_chat.dart';
 import 'domain/usecases/listen_for_delivered_messages.dart';
 import 'domain/usecases/listen_incoming_message.dart';
 import 'domain/usecases/send_message.dart';
-import 'presentation/bloc/chat_bloc.dart';
+import 'presentation/bloc/chat/chat_bloc.dart';
 import 'presentation/bloc/user/user_bloc.dart';
 
 final chatSl = GetIt.instance;
