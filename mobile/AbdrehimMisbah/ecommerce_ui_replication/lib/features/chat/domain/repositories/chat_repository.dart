@@ -21,10 +21,10 @@ abstract class ChatRepository {
   });
 
   /// Listen for new incoming messages
-  Stream<Either<Failure, IncomingSocketMessage>> get messageReceivedStream;
+  Stream<Either<Failure, Message>> get messageReceivedStream;
 
   /// Listen for delivery confirmation of sent messages
-  Stream<Either<Failure, IncomingSocketMessage>> get messageDeliveredStream;
+  Stream<Either<Failure, Message>> get messageDeliveredStream;
 
   Future<Either<Failure, List<User>>> getAllUsers();
 }

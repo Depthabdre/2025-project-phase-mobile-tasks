@@ -6,18 +6,21 @@ import '../bloc/chat/chat_bloc.dart';
 class ChatDetailScreen extends StatefulWidget {
   final String chatId;
   final String currentUserId;
+  final String otherUserId;
   final String otherUserName;
 
   const ChatDetailScreen({
     super.key,
     required this.chatId,
     required this.currentUserId,
+    required this.otherUserId,
     required this.otherUserName,
   });
 
   static Widget withBloc({
     required String chatId,
     required String currentUserId,
+    required String otherUserId,
     required String otherUserName,
   }) {
     return BlocProvider(
@@ -25,6 +28,7 @@ class ChatDetailScreen extends StatefulWidget {
       child: ChatDetailScreen(
         chatId: chatId,
         currentUserId: currentUserId,
+        otherUserId: otherUserId,
         otherUserName: otherUserName,
       ),
     );
@@ -53,6 +57,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
+          // maks sure to change into name later after debgginh
           widget.otherUserName,
           style: const TextStyle(
             color: Colors.black,
@@ -83,6 +88,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       final msg = messages[index];
                       final isMe = msg.sender.id == widget.currentUserId;
                       final key = '${msg.chatId}_${msg.content}';
+                      final content = msg.content;
+                      print("messag is $content");
 
                       return chatBubble(
                         isMe: isMe,
@@ -136,6 +143,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   icon: const Icon(Icons.send, color: Colors.blue),
                   onPressed: () {
                     final text = _messageController.text.trim();
+                    print("the send message is $text");
                     if (text.isNotEmpty) {
                       context.read<ChatBloc>().add(
                         SendMessageEvent(

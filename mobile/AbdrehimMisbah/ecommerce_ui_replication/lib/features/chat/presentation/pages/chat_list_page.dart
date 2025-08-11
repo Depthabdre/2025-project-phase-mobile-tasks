@@ -43,6 +43,7 @@ class ChatListScreen extends StatelessWidget {
                   builder: (_) => ChatDetailScreen.withBloc(
                     chatId: state.chat.id,
                     currentUserId: currentUserId,
+                    otherUserId: otherUser.id,
                     otherUserName: otherUser.name,
                   ),
                 ),
@@ -196,6 +197,7 @@ class ChatList extends StatelessWidget {
                 builder: (_) => ChatDetailScreen.withBloc(
                   chatId: chat.id,
                   currentUserId: currentUserId,
+                  otherUserId: otherUser.id,
                   otherUserName: otherUser.name,
                 ),
               ),

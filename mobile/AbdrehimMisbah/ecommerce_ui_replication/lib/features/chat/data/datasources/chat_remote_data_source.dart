@@ -48,11 +48,13 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
       final List<dynamic> chatListJson = body['data'];
+      print("loaded chat is  $chatListJson");
       final chats = chatListJson
           .map((json) => ChatModel.fromJson(json))
           .toList();
       return chats;
     } else {
+      print("Here is the date ERROR");
       throw ServerException();
     }
   }
@@ -65,11 +67,13 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
       final List<dynamic> messageListJson = body['data'];
+      print("here is the message $messageListJson");
       final messages = messageListJson
           .map((json) => MessageModel.fromJson(json))
           .toList();
       return messages;
     } else {
+      print("here is the error ");
       throw ServerException();
     }
   }
@@ -104,10 +108,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
       final List<dynamic> data = body['data'];
-      print("Here is the date $data");
       return data.map((json) => UserModel.fromJson(json)).toList();
     } else {
-      print("Here is the date ERROR");
       throw ServerException();
     }
   }

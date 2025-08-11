@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
 import '../entities/incoming_socket_message.dart';
+import '../entities/message.dart';
 import '../repositories/chat_repository.dart';
 
 class ListenForDeliveredMessages {
@@ -8,7 +9,7 @@ class ListenForDeliveredMessages {
 
   ListenForDeliveredMessages(this.repository);
 
-  Stream<Either<Failure, IncomingSocketMessage>> call() {
+  Stream<Either<Failure, Message>> call() {
     return repository.messageDeliveredStream;
   }
 }

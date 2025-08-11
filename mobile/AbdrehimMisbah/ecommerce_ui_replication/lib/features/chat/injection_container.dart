@@ -57,14 +57,10 @@ Future<void> initChat() async {
     ),
   );
 
-  final sharedPreferences = await SharedPreferences.getInstance();
+  // final sharedPreferences = await SharedPreferences.getInstance();
 
   chatSl.registerLazySingleton<ChatSocketDataSource>(
-    () => ChatSocketDataSourceImpl(
-      baseUrl:
-          'wss://g5-flutter-learning-path-be-tvum.onrender.com', // your socket URL
-      sharedPreferences: sharedPreferences,
-    ),
+    () => ChatSocketDataSourceImpl(sharedPreferences: chatSl()),
   );
 
   // Core dependencies (http.Client, SharedPreferences) should be registered globally, if not, register here:

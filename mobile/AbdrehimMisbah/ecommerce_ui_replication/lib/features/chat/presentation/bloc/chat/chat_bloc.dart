@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../../core/error/failure.dart';
-import '../../../../auth/domain/entities/user.dart';
 import '../../../domain/entities/chat.dart';
 import '../../../domain/entities/incoming_socket_message.dart';
 import '../../../domain/entities/message.dart';
@@ -77,7 +76,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
 
         _initialMessagesLoaded = true;
-        emit(MessagesLoaded(messages: messages));
+        emit(MessagesLoaded(messages: _currentMessages));
       },
     );
   }
@@ -88,9 +87,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     IncomingSocketMessage outgoingMessage = IncomingSocketMessage(
       chatId: event.chatId,
-      message: event.content,
+      content: event.content,
       type: 'text',
     );
+    
     final result = await sendMessage(outgoingMessage: outgoingMessage);
     result.fold(
       (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
@@ -124,19 +124,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   void _onIncomingMessage(IncomingMessageEvent event, Emitter<ChatState> emit) {
-    final newMsg = Message(
-      id: 'temp key', // temp ID
-      sender: const User(
-        id: 'otherUserId',
-        name: 'Unknown',
-        email: 'temp@gmail.com',
-      ), // you can map this properly
-      chatId: event.message.chatId,
-      content: event.message.message,
-      type: 'text',
-    );
-
-    _currentMessages.add(newMsg);
+    // Directly use the message from the event
+    _currentMessages.add(event.message);
     emit(MessagesLoaded(messages: List.from(_currentMessages)));
   }
 
@@ -145,13 +134,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) {
     if (_initialMessagesLoaded) {
-      final key = '${event.message.chatId}_${event.message.message}';
+      final key = '${event.message.chatId}_${event.message.content}';
 
       // Mark as delivered
       _deliveredMessageKeys.add(key);
+      _currentMessages.add(event.message);
 
       // Re-emit to update UI
-      emit(MessagesLoaded(messages: List.from(_currentMessages)));
+      emit(MessagesLoaded(messages: _currentMessages));
     }
   }
 

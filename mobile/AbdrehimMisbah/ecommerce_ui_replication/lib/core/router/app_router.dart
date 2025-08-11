@@ -90,6 +90,7 @@ class AppRouter {
           builder: (_) => ChatDetailScreen.withBloc(
             chatId: args['chatId'] as String,
             currentUserId: args['currentUserId'] as String,
+            otherUserId: args['otherUserId'] as String,
             otherUserName: args['otherUserName'] as String,
           ),
         );

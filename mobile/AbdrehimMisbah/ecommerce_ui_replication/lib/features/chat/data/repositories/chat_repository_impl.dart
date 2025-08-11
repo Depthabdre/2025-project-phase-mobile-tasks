@@ -55,9 +55,15 @@ class ChatRepositoryImpl implements ChatRepository {
     required IncomingSocketMessage outgoingMessage,
   }) async {
     try {
-      socketService.sendMessage(outgoingMessage: outgoingMessage);
-      return const Right(null); // success with no data
+      // Ensure connection first
+      await socketService.connect();
+
+      // Send the message (waits internally until connected)
+      await socketService.sendMessage(outgoingMessage: outgoingMessage);
+
+      return const Right(null); // success
     } catch (e) {
+      print('❌ Error sending message: $e');
       return Left(ServerFailure());
     }
   }
@@ -73,10 +79,10 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Stream<Either<Failure, IncomingSocketMessage>> get messageReceivedStream =>
+  Stream<Either<Failure, Message>> get messageReceivedStream =>
       socketService.messageReceivedStream;
 
   @override
-  Stream<Either<Failure, IncomingSocketMessage>> get messageDeliveredStream =>
+  Stream<Either<Failure, Message>> get messageDeliveredStream =>
       socketService.messageDeliveredStream;
 }

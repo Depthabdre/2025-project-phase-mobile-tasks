@@ -27,12 +27,12 @@ class SendMessageEvent extends ChatEvent {
 class StartListeningMessagesEvent extends ChatEvent {}
 
 class IncomingMessageEvent extends ChatEvent {
-  final IncomingSocketMessage message;
+  final Message message;
   const IncomingMessageEvent({required this.message});
 }
 
 class MessageDeliveredEvent extends ChatEvent {
-  final IncomingSocketMessage message;
+  final Message message;
   const MessageDeliveredEvent({required this.message});
 }
 
