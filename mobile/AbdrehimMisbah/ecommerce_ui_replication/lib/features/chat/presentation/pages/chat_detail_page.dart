@@ -96,12 +96,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     itemBuilder: (context, index) {
                       final msg = messages[index];
                       final isMe = msg.sender.id == widget.currentUserId;
-                      final key = msg.id ?? '${msg.chatId}_${msg.content}';
+                      final key = msg.id;
 
                       return ChatBubble(
                         isMe: isMe,
                         text: msg.content,
-                        time: _formatTime(msg.createdAt ?? DateTime.now()),
+                        time: _formatTime(msg.createdAt),
                         avatar: 'images/profile.png',
                         delivered: deliveredKeys.contains(key),
                       );
@@ -148,6 +148,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               ),
             ),
           ),
+
           IconButton(
             icon: const Icon(Icons.send, color: Colors.blue),
             onPressed: () {
@@ -173,7 +174,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
-    return "$hour:$minute";
+    return '$hour:$minute';
   }
 }
 

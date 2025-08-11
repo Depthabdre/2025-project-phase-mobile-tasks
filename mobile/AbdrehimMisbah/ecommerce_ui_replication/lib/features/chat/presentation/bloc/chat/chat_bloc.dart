@@ -70,9 +70,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
       (messages) {
         _currentMessages = messages;
-        _deliveredMessageKeys.addAll(
-          messages.map((msg) => msg.id ?? '${msg.chatId}_${msg.content}'),
-        );
+        _deliveredMessageKeys.addAll(messages.map((msg) => msg.id));
 
         _initialMessagesLoaded = true;
         emit(
@@ -145,8 +143,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) {
     if (!_initialMessagesLoaded) return;
 
-    final key =
-        event.message.id ?? '${event.message.chatId}_${event.message.content}';
+    final key = event.message.id;
     if (_deliveredMessageKeys.contains(key)) return;
 
     _deliveredMessageKeys.add(key);

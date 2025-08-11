@@ -195,6 +195,42 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        context.read<AuthBloc>().add(LogoutEvent());
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent, // Logout color
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 6,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Column(
+                          children: [
+                            Icon(Icons.logout, color: Colors.white, size: 26),
+                            SizedBox(height: 8),
+                            Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

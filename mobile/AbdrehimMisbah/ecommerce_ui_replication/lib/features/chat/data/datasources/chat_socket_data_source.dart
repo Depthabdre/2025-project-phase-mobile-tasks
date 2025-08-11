@@ -98,9 +98,14 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
         final message = MessageModel.fromJson(Map<String, dynamic>.from(data));
         _deliveredController.add(Right(message));
       } catch (e) {
-        print('⚠️ Error parsing delivered message: $e');
+        // print('⚠️ Error parsing delivered message: $e');
         _deliveredController.add(Left(ServerFailure()));
       }
+    });
+    _socket.on('message:error', (data) {
+      final error = data['error'] ?? 'Unknown error';
+      print('Message error: $error');
+      // onMessageError?.call(error); // Notify UI: "Something went wrong!"
     });
 
     // Wait until connected or failed

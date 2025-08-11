@@ -17,10 +17,7 @@ class ChatListScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => chatSl<ChatBloc>()..add(LoadChatsEvent())),
-        BlocProvider(
-          create: (_) =>
-              chatSl<UserBloc>()..add(LoadUsersEvent()), // This is needed
-        ),
+        BlocProvider(create: (_) => chatSl<UserBloc>()..add(LoadUsersEvent())),
       ],
       child: ChatListScreen(currentUserId: currentUserId),
     );
@@ -56,41 +53,87 @@ class ChatListScreen extends StatelessWidget {
           },
           child: Column(
             children: [
-              // Top Row - List of Users
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12,
+              // Gradient Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF3081F2), Color(0xFF56B4F2)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: BlocBuilder<UserBloc, UserState>(
-                        builder: (context, state) {
-                          if (state is UserLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (state is UsersLoaded) {
-                            return StatusAvatars(
-                              users: state.users,
-                              currentUserId: currentUserId,
-                            );
-                          } else if (state is UserError) {
-                            return Text(
-                              state.message,
-                              style: const TextStyle(color: Colors.white),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
+                    Row(
+                      children: [
+                        const Text(
+                          "Chats",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Search Bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(30),
                       ),
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.search, color: Colors.white70),
+                          hintText: "Search",
+                          hintStyle: TextStyle(color: Colors.white70),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Top Row - List of Users
+                    BlocBuilder<UserBloc, UserState>(
+                      builder: (context, state) {
+                        if (state is UserLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          );
+                        } else if (state is UsersLoaded) {
+                          final sortedUsers = List<User>.from(state.users)
+                            ..sort((a, b) => a.name.compareTo(b.name));
+                          return StatusAvatars(
+                            users: sortedUsers,
+                            currentUserId: currentUserId,
+                          );
+                        } else if (state is UserError) {
+                          return Text(
+                            state.message,
+                            style: const TextStyle(color: Colors.white),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
                   ],
                 ),
               ),
 
-              // Chat List Container
+              // Chat List
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -152,9 +195,27 @@ class StatusAvatars extends StatelessWidget {
             },
             child: Column(
               children: [
-                const CircleAvatar(
-                  radius: 26,
-                  backgroundImage: AssetImage('images/profile.png'),
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: const AssetImage('images/profile.png'),
+                      backgroundColor: Colors.grey[200],
+                    ),
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -182,7 +243,7 @@ class ChatList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: chats.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 20),
+      separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final chat = chats[index];
         final otherUser = chat.user1.id == currentUserId
@@ -204,22 +265,57 @@ class ChatList extends StatelessWidget {
             );
           },
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                radius: 24,
-                backgroundImage: AssetImage('images/profile.png'),
+              CircleAvatar(
+                radius: 28,
+                backgroundImage: const AssetImage('images/profile.png'),
+                backgroundColor: Colors.grey[200],
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  otherUser.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      otherUser.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Last message preview...",
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                children: [
+                  Text(
+                    "12:30 PM",
+                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      "2",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
