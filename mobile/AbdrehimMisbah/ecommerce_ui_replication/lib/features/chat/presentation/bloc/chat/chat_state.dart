@@ -17,7 +17,12 @@ class ChatsLoaded extends ChatState {
 
 class MessagesLoaded extends ChatState {
   final List<Message> messages;
-  const MessagesLoaded({required this.messages});
+  final Set<String> deliveredKeys;
+
+  const MessagesLoaded({required this.messages, this.deliveredKeys = const {}});
+
+  @override
+  List<Object?> get props => [messages, deliveredKeys];
 }
 
 class ChatInitiated extends ChatState {

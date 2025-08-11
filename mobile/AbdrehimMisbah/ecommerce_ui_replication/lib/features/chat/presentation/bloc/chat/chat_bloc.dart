@@ -76,7 +76,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
 
         _initialMessagesLoaded = true;
-        emit(MessagesLoaded(messages: _currentMessages));
+        emit(
+          MessagesLoaded(
+            messages: List.from(_currentMessages),
+            deliveredKeys: Set.from(_deliveredMessageKeys),
+          ),
+        );
       },
     );
   }
@@ -90,7 +95,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       content: event.content,
       type: 'text',
     );
-    
+
     final result = await sendMessage(outgoingMessage: outgoingMessage);
     result.fold(
       (failure) => emit(ChatError(message: _mapFailureToMessage(failure))),
@@ -124,9 +129,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   void _onIncomingMessage(IncomingMessageEvent event, Emitter<ChatState> emit) {
-    // Directly use the message from the event
-    _currentMessages.add(event.message);
-    emit(MessagesLoaded(messages: List.from(_currentMessages)));
+    if (_currentMessages.any((m) => m.id == event.message.id)) {
+      return; // already exists, avoid duplicate & rebuild
+    }
+
+    _currentMessages = [..._currentMessages, event.message];
+    emit(
+      MessagesLoaded(
+        messages: List.from(_currentMessages),
+        deliveredKeys: Set.from(_deliveredMessageKeys),
+      ),
+    );
   }
 
   void _onMessageDelivered(
@@ -136,12 +149,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_initialMessagesLoaded) {
       final key = '${event.message.chatId}_${event.message.content}';
 
-      // Mark as delivered
-      _deliveredMessageKeys.add(key);
-      _currentMessages.add(event.message);
-
-      // Re-emit to update UI
-      emit(MessagesLoaded(messages: _currentMessages));
+      if (!_deliveredMessageKeys.contains(key)) {
+        _deliveredMessageKeys.add(key);
+        _currentMessages = List.from(_currentMessages)..add(event.message);
+        emit(
+          MessagesLoaded(
+            messages: List.from(_currentMessages),
+            deliveredKeys: Set.from(_deliveredMessageKeys),
+          ),
+        );
+      }
     }
   }
 

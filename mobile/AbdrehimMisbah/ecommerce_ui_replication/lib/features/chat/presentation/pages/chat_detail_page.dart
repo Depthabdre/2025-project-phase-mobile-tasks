@@ -76,9 +76,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (state is MessagesLoaded) {
-                  final deliveredKeys = context
-                      .read<ChatBloc>()
-                      .deliveredMessageKeys;
+                  final deliveredKeys = state.deliveredKeys;
                   final messages = state.messages;
 
                   return ListView.builder(
